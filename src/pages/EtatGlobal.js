@@ -4,25 +4,33 @@ export const EtatGlobalContext = createContext();
 
 export const EtatGlobalProvider = ({ children }) => {
   const [clients, setClients] = useState([]);
-  const [clientSelect, setClientSelect] = useState(null); // client sélectionné
+  const [clientSelect, setClientSelect] = useState(null);
+  const [loading, setLoading] = useState(true); // 👈 AJOUT
 
-  // Chargement depuis le localStorage au démarrage
   useEffect(() => {
     const storedClients = localStorage.getItem("clients");
+
     if (storedClients) {
       const parsedClients = JSON.parse(storedClients);
       setClients(parsedClients);
 
-      // Sélectionner automatiquement le premier client si existant
       if (parsedClients.length > 0) {
         setClientSelect(parsedClients[0]);
       }
     }
-  }, []); // [] pour exécuter seulement au montage
+
+    setLoading(false); // 👈 FIN DU CHARGEMENT
+  }, []);
 
   return (
     <EtatGlobalContext.Provider
-      value={{ clients, setClients, clientSelect, setClientSelect }}
+      value={{
+        clients,
+        setClients,
+        clientSelect,
+        setClientSelect,
+        loading, // 👈 exposé au contexte
+      }}
     >
       {children}
     </EtatGlobalContext.Provider>

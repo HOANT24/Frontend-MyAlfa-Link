@@ -17,7 +17,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-import Dashboard from "../login/login";
+import Dashboard from "../dashboard/dashboard";
 import Documents from "../documents/documents";
 import Requests from "../demandes/demandes";
 import Questionnaires from "../questionnaires/questionnaires";

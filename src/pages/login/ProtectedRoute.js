@@ -3,14 +3,18 @@ import { Navigate } from "react-router-dom";
 import { EtatGlobalContext } from "../EtatGlobal";
 
 const ProtectedRoute = ({ children }) => {
-  const { clients } = useContext(EtatGlobalContext);
+  const { clients, loading } = useContext(EtatGlobalContext);
 
-  // Si clients est vide ou null → redirige vers login
+  // ⏳ Tant que le localStorage n'est pas lu
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
+  // 🔒 Aucune donnée → login
   if (!clients || clients.length === 0) {
     return <Navigate to="/login" replace />;
   }
 
-  // Sinon on affiche le composant demandé
   return children;
 };
 
