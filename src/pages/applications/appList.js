@@ -6,7 +6,7 @@ export const appList = [
     description: "Suivi de vos emprunts professionnels",
     category: "bancaire",
     icon: "Globe",
-    url: "myalfa-worksync.vercel.app",
+    url: "",
   },
   {
     id: 2,
@@ -14,7 +14,7 @@ export const appList = [
     description: "Gestion de vos véhicules professionnels",
     category: "administratif",
     icon: "Globe",
-    url: "myalfa-worksync.vercel.app",
+    url: "",
   },
   {
     id: 3,
@@ -22,7 +22,7 @@ export const appList = [
     description: "Établir un inventaire de stock",
     category: "administratif",
     icon: "Globe",
-    url: "myalfa-worksync.vercel.app",
+    url: "",
   },
   {
     id: 4,
@@ -30,7 +30,7 @@ export const appList = [
     description: "Calculateur d'indemnés kilométriques",
     category: "fiscal",
     icon: "Globe",
-    url: "myalfa-worksync.vercel.app",
+    url: "",
   },
   {
     id: 5,
@@ -46,7 +46,7 @@ export const appList = [
     description: "Espace professionnel des impôts",
     category: "fiscal",
     icon: "Calculator",
-    url: "",
+    url: "https://www.impots.gouv.fr/accueil",
   },
   {
     id: 7,
@@ -54,7 +54,7 @@ export const appList = [
     description: "Déclarations et paiements URSSAF",
     category: "social",
     icon: "Users",
-    url: "",
+    url: "https://www.urssaf.fr/accueil.html",
   },
   {
     id: 8,
@@ -62,7 +62,7 @@ export const appList = [
     description: "Portail déclaratif social",
     category: "social",
     icon: "Building2",
-    url: "",
+    url: "https://www.net-entreprises.fr/",
   },
   {
     id: 9,
@@ -70,7 +70,7 @@ export const appList = [
     description: "Registre du commerce",
     category: "administratif",
     icon: "FileText",
-    url: "",
+    url: "https://www.infogreffe.fr/",
   },
   {
     id: 10,
@@ -86,6 +86,6 @@ export const appList = [
     description: "Centre de formalités des entreprises",
     category: "administratif",
     icon: "Globe",
-    url: "",
+    url: "https://www.cfe.urssaf.fr/",
   },
 ];
