@@ -5,7 +5,10 @@ export const EtatGlobalContext = createContext();
 export const EtatGlobalProvider = ({ children }) => {
   const [clients, setClients] = useState([]);
   const [clientSelect, setClientSelect] = useState(null);
-  const [loading, setLoading] = useState(true); // 👈 AJOUT
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Ajouter l'état global pour currentPage
+  const [currentPage, setCurrentPage] = useState("Documents");
 
   useEffect(() => {
     const storedClients = localStorage.getItem("clients");
@@ -19,7 +22,7 @@ export const EtatGlobalProvider = ({ children }) => {
       }
     }
 
-    setLoading(false); // 👈 FIN DU CHARGEMENT
+    setLoading(false);
   }, []);
 
   return (
@@ -29,7 +32,9 @@ export const EtatGlobalProvider = ({ children }) => {
         setClients,
         clientSelect,
         setClientSelect,
-        loading, // 👈 exposé au contexte
+        loading,
+        currentPage, // ✅ exposer currentPage
+        setCurrentPage, // ✅ exposer setCurrentPage
       }}
     >
       {children}

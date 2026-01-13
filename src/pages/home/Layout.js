@@ -45,9 +45,14 @@ const navigation = [
 
 function Layout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [currentPage, setCurrentPage] = useState("Documents");
-  const { clients, clientSelect, setClientSelect } =
-    useContext(EtatGlobalContext);
+
+  const {
+    clients,
+    clientSelect,
+    setClientSelect,
+    currentPage,
+    setCurrentPage,
+  } = useContext(EtatGlobalContext);
 
   if (clients.length === 0) {
     return (
