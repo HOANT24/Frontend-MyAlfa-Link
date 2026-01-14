@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { EtatGlobalContext } from "../EtatGlobal";
 import { Plus, Send, Clock, CheckCircle } from "lucide-react";
 import { Button } from "../../components/ui/button";
@@ -46,12 +46,11 @@ const statusConfig = {
 };
 
 function Demandes() {
-  const [demandes, setDemandes] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [loadingForm, setLoadingForm] = useState(false);
-  const { clientSelect } = useContext(EtatGlobalContext);
+  const { clientSelect, demandes, loadingDemandes, fetchDemandes } =
+    useContext(EtatGlobalContext);
 
   const requestTypes = [
     {
@@ -98,26 +97,7 @@ function Demandes() {
     details: "",
   });
 
-  // 🔄 Récupération des demandes
-
-  const fetchDemandes = useCallback(() => {
-    if (!clientSelect.id) return;
-
-    setLoading(true);
-    fetch(
-      `https://backend-myalfa.vercel.app/api/demande/client/${clientSelect.id}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setDemandes(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [clientSelect.id]);
-
-  useEffect(() => {
-    fetchDemandes();
-  }, [fetchDemandes]);
+  // 🔄 Récupération des demande
 
   // ➕ Ajouter une demande
   const handleSubmit = (e) => {
@@ -135,7 +115,7 @@ function Demandes() {
     })
       .then((res) => res.json())
       .then(() => {
-        fetchDemandes(); // 🔄 recharger depuis l’API
+        fetchDemandes(clientSelect.id); // 🔄 recharger depuis l’API
         setShowForm(false);
         setFormData({ type: "rib", urgence: "Normal", details: "" });
         setActiveTab("all");
@@ -173,6 +153,17 @@ function Demandes() {
     }
   };
 
+  if (loadingDemandes) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2
+          className="w-8 h-8 animate-spin text-slate-400"
+          color="#981845"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -196,11 +187,8 @@ function Demandes() {
           </Button>
         </div>
 
-        {/* Chargement */}
-        {loading && <p>Chargement des demandes ...</p>}
-
         {/* Onglets */}
-        {!loading && (
+        {!loadingDemandes && (
           <div className="bg-white rounded-2xl shadow-sm p-4 mb-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="bg-slate-100 p-1">

@@ -72,7 +72,7 @@ export default function DocumentViewer({ document, onClose }) {
           )}
           <p className="text-xs text-slate-400 mt-2">
             Ajouté le{" "}
-            {format(new Date(document.created_date), "dd MMMM yyyy", {
+            {format(new Date(document.createdDate), "dd MMMM yyyy", {
               locale: fr,
             })}
           </p>

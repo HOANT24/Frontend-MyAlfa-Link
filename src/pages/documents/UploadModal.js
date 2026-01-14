@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,31 +7,16 @@ import {
 } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
 import { Upload, Loader2, FileText, X } from "lucide-react";
 
-const folders = [
-  { value: "comptabilite", label: "Comptabilité" },
-  { value: "fiscal", label: "Fiscal" },
-  { value: "social", label: "Social" },
-  { value: "juridique", label: "Juridique" },
-  { value: "divers", label: "Divers" },
-];
+import { EtatGlobalContext } from "../EtatGlobal";
 
-const currentYear = new Date().getFullYear();
-const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
-
-export default function UploadModal({ open, onClose, onUpload, userEmail }) {
+export default function UploadModal({ open, onClose }) {
+  const { clientSelect, fetchDocuments } = useContext(EtatGlobalContext);
   const [file, setFile] = useState(null);
   const [name, setName] = useState("");
-  const [folder, setFolder] = useState("divers");
-  const [year, setYear] = useState(currentYear.toString());
+  const [folder, setFolder] = useState("comptabilite");
+  const [path, setPath] = useState("");
   const [description, setDescription] = useState("");
   const [uploading, setUploading] = useState(false);
 
@@ -45,13 +30,41 @@ export default function UploadModal({ open, onClose, onUpload, userEmail }) {
     }
   };
 
+  console.log("Selected folder:", folder);
+  console.log("Selected path:", path);
+  console.log("Client ID:", clientSelect?.id);
+
   const handleSubmit = async () => {
     if (!file || !name || !folder) return;
 
     setUploading(true);
-    try {
-      console.log("Upload fichier");
 
+    try {
+      const formData = new FormData();
+
+      formData.append("document", file);
+      formData.append("name", name);
+      formData.append("folder", folder);
+      formData.append("path", path || folder);
+      formData.append("description", description);
+      formData.append("uploadedBy", "admin");
+      formData.append("clientId", clientSelect?.id);
+
+      const response = await fetch(
+        "https://backend-myalfa.vercel.app/api/documents-ged",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de l’upload du document");
+      }
+
+      const result = await response.json();
+      console.log("Document GED créé :", result);
+      fetchDocuments(clientSelect?.id);
       handleClose();
     } catch (error) {
       console.error("Upload error:", error);
@@ -64,7 +77,6 @@ export default function UploadModal({ open, onClose, onUpload, userEmail }) {
     setFile(null);
     setName("");
     setFolder("divers");
-    setYear(currentYear.toString());
     setDescription("");
     onClose();
   };
@@ -72,6 +84,53 @@ export default function UploadModal({ open, onClose, onUpload, userEmail }) {
   const handleDialogChange = (isOpen) => {
     if (!isOpen) handleClose();
   };
+
+  const folderStructure = [
+    {
+      id: "comptabilite",
+      name: "comptabilite",
+      children: [
+        { id: "comptabilite/factures", name: "Factures" },
+        { id: "comptabilite/releves", name: "Relevés bancaires" },
+        { id: "comptabilite/grand_livre", name: "Grand livre" },
+      ],
+    },
+    {
+      id: "fiscal",
+      name: "fiscal",
+      children: [
+        { id: "fiscal/declarations", name: "Déclarations" },
+        { id: "fiscal/tva", name: "TVA" },
+        { id: "fiscal/is", name: "Impôt sur les sociétés" },
+      ],
+    },
+    {
+      id: "social",
+      name: "social",
+      children: [
+        { id: "social/bulletins", name: "Bulletins de paie" },
+        { id: "social/declarations", name: "Déclarations sociales" },
+        { id: "social/contrats", name: "Contrats de travail" },
+      ],
+    },
+    {
+      id: "juridique",
+      name: "juridique",
+      children: [
+        { id: "juridique/statuts", name: "Statuts" },
+        { id: "juridique/pv", name: "PV d'assemblée" },
+        { id: "juridique/contrats", name: "Contrats" },
+      ],
+    },
+    {
+      id: "divers",
+      name: "divers",
+      children: [],
+    },
+  ];
+
+  const selectedFolder = folderStructure.find((f) => f.id === folder);
+  const availablePaths = selectedFolder?.children || [];
 
   return (
     <Dialog open={open} onOpenChange={handleDialogChange}>
@@ -127,46 +186,70 @@ export default function UploadModal({ open, onClose, onUpload, userEmail }) {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
+            {/* Folder */}
             <div className="space-y-2">
               <label>Dossier</label>
-              <Select value={folder} onValueChange={setFolder}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {folders.map((f) => (
-                    <SelectItem key={f.value} value={f.value}>
-                      {f.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select
+                value={folder}
+                onChange={(e) => {
+                  setFolder(e.target.value);
+                  setPath("");
+                }}
+                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm"
+              >
+                {folderStructure.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
+            {/* Path */}
             <div className="space-y-2">
-              <label>Année</label>
-              <Select value={year} onValueChange={setYear}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((y) => (
-                    <SelectItem key={y} value={y.toString()}>
-                      {y}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label>Sous-dossier</label>
+              <select
+                value={path}
+                onChange={(e) => setPath(e.target.value)}
+                disabled={availablePaths.length === 0}
+                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm disabled:bg-slate-100"
+              >
+                <option value="">
+                  {availablePaths.length === 0
+                    ? "Aucun sous-dossier"
+                    : "Sélectionner"}
+                </option>
+
+                {availablePaths.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div
+            className="space-y-2 "
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              marginTop: "8%",
+            }}
+          >
             <label>Description (optionnel)</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Ajoutez une description..."
               rows={2}
+              style={{
+                border: "1px solid #e2e8f0",
+                borderRadius: "0.75rem",
+                padding: "0.5rem",
+                fontSize: "0.875rem",
+                width: "100%",
+              }}
             />
           </div>
 

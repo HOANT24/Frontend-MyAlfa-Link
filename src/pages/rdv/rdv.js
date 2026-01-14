@@ -1,6 +1,14 @@
-import React, { useEffect, useState, useCallback, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { EtatGlobalContext } from "../EtatGlobal";
-import { Plus, Calendar, MapPin, Video, Phone, Clock } from "lucide-react";
+import {
+  Plus,
+  Calendar,
+  MapPin,
+  Video,
+  Phone,
+  Clock,
+  Loader2,
+} from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -12,11 +20,10 @@ const typeIcons = {
 };
 
 function RDV() {
-  const { clientSelect } = useContext(EtatGlobalContext);
+  const { clientSelect, rdvs, loadingRdv, fetchRdv } =
+    useContext(EtatGlobalContext);
   const clientId = clientSelect?.id;
 
-  const [rdvs, setRdvs] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [loadingForm, setLoadingForm] = useState(false);
 
@@ -27,24 +34,6 @@ function RDV() {
     objetRdv: "",
     note: "",
   });
-
-  // 🔄 Récupération des RDV
-  const fetchRdvs = useCallback(() => {
-    if (!clientId) return;
-
-    setLoading(true);
-    fetch(`https://backend-myalfa.vercel.app/api/rdv/client/${clientId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setRdvs(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [clientId]);
-
-  useEffect(() => {
-    fetchRdvs();
-  }, [fetchRdvs]);
 
   // ➕ Ajouter un RDV
   const handleSubmit = (e) => {
@@ -63,7 +52,7 @@ function RDV() {
       }),
     })
       .then(() => {
-        fetchRdvs();
+        fetchRdv(clientSelect.id);
         setShowForm(false);
         setFormData({
           type: "Au Cabinet",
@@ -79,6 +68,17 @@ function RDV() {
   const sortedAppointments = [...rdvs].sort(
     (a, b) => new Date(b.dateRdv) - new Date(a.dateRdv)
   );
+
+  if (loadingRdv) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2
+          className="w-8 h-8 animate-spin text-slate-400"
+          color="#981845"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -103,9 +103,7 @@ function RDV() {
           </Button>
         </div>
 
-        {loading && <p>Chargement des rendez-vous...</p>}
-
-        {!loading && (
+        {!loadingRdv && (
           <div className="space-y-10">
             {sortedAppointments.length > 0 ? (
               <Section title="À venir" rdvs={sortedAppointments} />

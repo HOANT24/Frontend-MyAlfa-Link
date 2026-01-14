@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Loader2, Upload, Search, FileX } from "lucide-react";
@@ -9,49 +9,27 @@ import UploadModal from "./UploadModal";
 import DocumentTree from "./DocumentTree";
 import DocumentViewer from "./DocumentViewer";
 
-import { documentsData } from "./DocumentsData";
+import { EtatGlobalContext } from "../EtatGlobal";
 
 export default function Documents() {
-  const [user, setUser] = useState(null);
-  const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { documents, setDocuments, loadingDocument } =
+    useContext(EtatGlobalContext);
+
+  const [user] = useState({
+    email: "client@test.com",
+    name: "Client Test",
+  });
+
   const [activeFolder, setActiveFolder] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      // Fake user (en attendant l'API)
-      const fakeUser = {
-        email: "client@test.com",
-        name: "Client Test",
-      };
-
-      setUser(fakeUser);
-
-      // Simulation d'un tri par date décroissante
-      const sortedDocs = [...documentsData].sort(
-        (a, b) => new Date(b.created_date) - new Date(a.created_date)
-      );
-
-      setDocuments(sortedDocs);
-    } catch (error) {
-      console.error("Error loading documents:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleUpload = async (docData) => {
     const newDoc = {
       id: crypto.randomUUID(),
-      created_date: new Date().toISOString(),
-      uploaded_by: "client",
+      createdDate: new Date().toISOString(),
+      uploadedBy: "client",
       ...docData,
     };
 
@@ -64,20 +42,13 @@ export default function Documents() {
   };
 
   const filteredDocuments = documents.filter((doc) => {
-    // 1️⃣ Gestion du dossier / sous-dossier
     let matchesFolder = false;
 
-    if (activeFolder === "all") {
-      matchesFolder = true;
-    } else if (activeFolder.includes("/")) {
-      // Sous-dossier → match strict sur le path
+    if (activeFolder === "all") matchesFolder = true;
+    else if (activeFolder.includes("/"))
       matchesFolder = doc.path === activeFolder;
-    } else {
-      // Dossier parent → match sur le folder
-      matchesFolder = doc.folder === activeFolder;
-    }
+    else matchesFolder = doc.folder === activeFolder;
 
-    // 2️⃣ Recherche texte
     const matchesSearch =
       !searchTerm ||
       doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -86,10 +57,13 @@ export default function Documents() {
     return matchesFolder && matchesSearch;
   });
 
-  if (loading) {
+  if (loadingDocument) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+        <Loader2
+          className="w-8 h-8 animate-spin text-slate-400"
+          color="#981845"
+        />
       </div>
     );
   }
@@ -173,7 +147,7 @@ export default function Documents() {
                     <DocumentCard
                       document={doc}
                       onDelete={handleDelete}
-                      canDelete={doc.uploaded_by === "client"}
+                      canDelete={doc.uploadedBy === "client"}
                     />
                   </div>
                 ))}

@@ -52,7 +52,7 @@ export default function DocumentCard({
               </div>
             )}
             <div className="flex items-center gap-1 text-xs text-slate-500">
-              {document.uploaded_by === "admin" ? (
+              {document.uploadedBy === "admin" ? (
                 <>
                   <Building2 className="w-3 h-3" />
                   <span>Cabinet</span>
@@ -71,7 +71,7 @@ export default function DocumentCard({
             </p>
           )}
           <p className="text-xs text-slate-400 mt-2">
-            {format(new Date(document.created_date), "d MMMM yyyy", {
+            {format(new Date(document.createdDate), "d MMMM yyyy", {
               locale: fr,
             })}
           </p>

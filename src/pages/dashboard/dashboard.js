@@ -10,29 +10,25 @@ import { EtatGlobalContext } from "../EtatGlobal";
 export default function Dashboard() {
   const { clientSelect } = useContext(EtatGlobalContext);
   // Données statiques pour le moment
-  const [user] = useState({
-    full_name: clientSelect.nom,
-    email: "johndoe@example.com",
-  });
 
   const [documents] = useState([
     {
       id: 1,
       name: "Document 1",
-      uploaded_by: "cabinet",
-      created_date: "2026-01-01",
+      uploadedBy: "cabinet",
+      createdDate: "2026-01-01",
     },
     {
       id: 2,
       name: "Document 2",
-      uploaded_by: "client",
-      created_date: "2026-01-05",
+      uploadedBy: "client",
+      createdDate: "2026-01-05",
     },
   ]);
 
   const [requests] = useState([
-    { id: 1, type: "kbis", status: "pending", created_date: "2026-01-03" },
-    { id: 2, type: "other", status: "completed", created_date: "2026-01-06" },
+    { id: 1, type: "kbis", status: "pending", createdDate: "2026-01-03" },
+    { id: 2, type: "other", status: "completed", createdDate: "2026-01-06" },
   ]);
 
   const [questionnaires] = useState([
@@ -60,7 +56,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <WelcomeHeader userName={user?.full_name || "Client"} />
+        <WelcomeHeader userName={clientSelect.nom || "Client"} />
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
           <ActionStatsCard
