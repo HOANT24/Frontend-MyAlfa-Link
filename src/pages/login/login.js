@@ -44,6 +44,11 @@ function Login() {
       const clientsTable = data.map((client) => ({
         id: client.id,
         nom: client.nom,
+        email_expertComptable: client.email_expertComptable,
+        email_superviseur: client.email_superviseur,
+        email_collaborateur: client.email_collaborateur,
+        email_collaborateur_niv2: client.email_collaborateur_niv2,
+        email_social: client.email_social,
       }));
 
       // Stockage global (Context)

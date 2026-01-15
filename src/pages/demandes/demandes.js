@@ -97,7 +97,31 @@ function Demandes() {
     details: "",
   });
 
+  console.log(clientSelect.email_expertComptable);
+  console.log(clientSelect.email_collaborateur);
+  console.log(clientSelect.email_collaborateur_niv2);
+  console.log(clientSelect.email_social);
+  console.log(clientSelect.nom);
   // 🔄 Récupération des demande
+
+  const getEmailByType = (type) => {
+    switch (type) {
+      case "attestation_vigilance":
+        return clientSelect.email_social;
+
+      case "kbis":
+      case "RIB":
+      case "attestation_fiscale":
+        return clientSelect.email_collaborateur;
+
+      case "situation_comptable":
+      case "autre":
+        return clientSelect.email_expertComptable;
+
+      default:
+        return null;
+    }
+  };
 
   // ➕ Ajouter une demande
   const handleSubmit = (e) => {
@@ -111,6 +135,8 @@ function Demandes() {
         ...formData,
         etat: "En cours",
         clientId: clientSelect.id,
+        email: getEmailByType(formData.type),
+        client: clientSelect.nom,
       }),
     })
       .then((res) => res.json())

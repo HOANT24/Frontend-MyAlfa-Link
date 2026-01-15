@@ -77,6 +77,9 @@ export default function Documents() {
               <h1 className="text-2xl font-semibold text-slate-800">
                 Mes documents
               </h1>
+              {/* <p> expert comptable : {clientSelect.email_expertComptable}</p>
+              <p> niv1 : {clientSelect.email_collaborateur}</p>
+              <p> niv2 : {clientSelect.email_collaborateur_niv2}</p> */}
               <p className="text-slate-500 mt-1">
                 Gestion électronique de vos documents
               </p>
