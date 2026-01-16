@@ -107,12 +107,14 @@ function Demandes() {
   const getEmailByType = (type) => {
     switch (type) {
       case "attestation_vigilance":
-        return clientSelect.email_social;
+        return clientSelect.email_social || clientSelect.email_expertComptable;
 
       case "kbis":
       case "RIB":
       case "attestation_fiscale":
-        return clientSelect.email_collaborateur;
+        return (
+          clientSelect.email_collaborateur || clientSelect.email_expertComptable
+        );
 
       case "situation_comptable":
       case "autre":

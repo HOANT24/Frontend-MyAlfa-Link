@@ -35,27 +35,88 @@ function RDV() {
     note: "",
   });
 
+  console.log("--------- CLIENT SELECT RDV ---------");
+  console.log(clientSelect.email_expertComptable);
+  console.log(clientSelect.email_collaborateur);
+  console.log(clientSelect.email_collaborateur_niv2);
+  console.log(clientSelect.email_social);
+  console.log(clientSelect.nom);
+  console.log(clientSelect.email);
+
+  const OBJETS_RDV = {
+    Collab: [
+      "Transmission de documents comptables",
+      "Question sur ma comptabilité / mes chiffres",
+      "Dépôt de pièces manquantes",
+      "Suivi de ma mission comptable",
+      "Autre question comptable",
+    ],
+    "Collab social": [
+      "Question sur un bulletin de paie",
+      "Embauche / départ d’un salarié",
+      "Contrat de travail / avenant",
+      "Absence, arrêt maladie, congés",
+      "Autre question sociale",
+    ],
+    "Expert-comptable": [
+      "Question fiscale ou patrimoniale",
+      "Arbitrage ou décision stratégique",
+      "Situation exceptionnelle",
+      "Validation ou avis de l’expert",
+      "Autre demande nécessitant l’expert",
+    ],
+  };
+
+  const getEmailByObjet = (objet, client) => {
+    if (OBJETS_RDV["Expert-comptable"].includes(objet)) {
+      return client.email_collaborateur || client.email_expertComptable;
+    }
+
+    if (OBJETS_RDV["Collab social"].includes(objet)) {
+      return client.email_collaborateur || client.email_expertComptable;
+    }
+
+    if (OBJETS_RDV["Collab"].includes(objet)) {
+      // Tu peux ajuster la logique ici si besoin
+      return client.email_collaborateur || client.email_expertComptable;
+    }
+
+    return null;
+  };
+
   // ➕ Ajouter un RDV
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoadingForm(true);
 
+    const emailObjet = getEmailByObjet(formData.objetRdv, clientSelect);
+
+    const emailsInvites = [
+      clientSelect.email, // toujours le client
+      emailObjet,
+    ].filter(Boolean); // supprime les null / undefined
+
     fetch("https://backend-myalfa.vercel.app/api/rdv", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...formData,
-        clientId,
+        type: formData.type,
         dateRdv: new Date(
           `${formData.dateRdv}T${formData.heureRdv}:00`
         ).toISOString(),
+        heureRdv: formData.heureRdv,
+        objetRdv: formData.objetRdv,
+        note: formData.note,
+        clientId,
+        client: clientSelect.nom,
+        emailsInvites,
       }),
     })
       .then(() => {
         fetchRdv(clientSelect.id);
         setShowForm(false);
         setFormData({
-          type: "Au Cabinet",
+          type: "Au cabinet",
           dateRdv: "",
           heureRdv: "",
           objetRdv: "",
@@ -165,6 +226,35 @@ function RDV() {
                 </div>
               </div>
 
+              {/* Objet */}
+              <select
+                className="w-full border rounded-xl p-2"
+                value={formData.objetRdv}
+                onChange={(e) =>
+                  setFormData({ ...formData, objetRdv: e.target.value })
+                }
+                required
+              >
+                <option value="">Sélectionner un objet</option>
+
+                {Object.values(OBJETS_RDV).map((items, index) => (
+                  <React.Fragment key={index}>
+                    {items.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+
+                    {/* Espace visuel entre les groupes */}
+                    {index < Object.values(OBJETS_RDV).length - 1 && (
+                      <option disabled value={`separator-${index}`}>
+                        ────────────────
+                      </option>
+                    )}
+                  </React.Fragment>
+                ))}
+              </select>
+
               {/* Date & heure */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -191,20 +281,6 @@ function RDV() {
                     required
                   />
                 </div>
-              </div>
-
-              {/* Objet */}
-              <div>
-                <label className="text-sm font-medium">Objet</label>
-                <input
-                  type="text"
-                  className="w-full border rounded-xl p-2"
-                  value={formData.objetRdv}
-                  onChange={(e) =>
-                    setFormData({ ...formData, objetRdv: e.target.value })
-                  }
-                  required
-                />
               </div>
 
               {/* Note */}

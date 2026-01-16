@@ -44,6 +44,7 @@ function Login() {
       const clientsTable = data.map((client) => ({
         id: client.id,
         nom: client.nom,
+        email: client.email,
         email_expertComptable: client.email_expertComptable,
         email_superviseur: client.email_superviseur,
         email_collaborateur: client.email_collaborateur,
