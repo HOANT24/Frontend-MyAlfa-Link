@@ -4,6 +4,7 @@ import Home from "./pages/home/home";
 import Login from "./pages/login/login";
 import Documents from "./pages/documents/documents";
 import ProtectedRoute from "./pages/login/ProtectedRoute";
+import PreviewHtml from "./pages/previewHTML/PreviewHtml";
 import { EtatGlobalProvider } from "./pages/EtatGlobal";
 
 function App() {
@@ -28,6 +29,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Documents />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/preview-html"
+            element={
+              <ProtectedRoute>
+                <PreviewHtml />
               </ProtectedRoute>
             }
           />

@@ -15,7 +15,7 @@ export const EtatGlobalProvider = ({ children }) => {
   const [rdvs, setRdv] = useState([]);
   const [loadingRdv, setLoadingRdv] = useState(true);
 
-  const [currentPage, setCurrentPage] = useState("Documents");
+  const [currentPage, setCurrentPage] = useState("Dashboard");
 
   useEffect(() => {
     const storedClients = localStorage.getItem("clients");
