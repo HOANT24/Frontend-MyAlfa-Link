@@ -1,10 +1,11 @@
 import React, { useContext } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { EtatGlobalContext } from "../EtatGlobal";
 import { Loader2, ShieldCheck } from "lucide-react";
 
 const ProtectedRoute = ({ children }) => {
   const { clients, loading } = useContext(EtatGlobalContext);
+  const location = useLocation();
 
   // ⏳ Tant que le localStorage n'est pas lu
 
@@ -39,7 +40,13 @@ const ProtectedRoute = ({ children }) => {
 
   // 🔒 Aucune donnée → login
   if (!clients || clients.length === 0) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location }} // 👈 on sauvegarde la route demandée
+      />
+    );
   }
 
   return children;

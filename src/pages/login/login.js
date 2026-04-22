@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import "./Login.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { EtatGlobalContext } from "../EtatGlobal";
 import logo from "../../assets/images/logo.webp";
 import ImageLogin from "../../assets/images/LoginImage.webp";
@@ -11,6 +11,11 @@ import { Lock, Eye, EyeOff, Mail, ArrowRight } from "lucide-react";
 function Login() {
   const { setClients, setClientSelect } = useContext(EtatGlobalContext);
   const navigate = useNavigate(); // <-- hook pour rediriger
+  const location = useLocation();
+
+  const from = location.state?.from
+    ? location.state.from.pathname + location.state.from.search
+    : "/home";
 
   const [email, setEmail] = useState("");
   const [mdp, setMdp] = useState("");
@@ -62,7 +67,7 @@ function Login() {
       localStorage.setItem("clients", JSON.stringify(clientsTable));
 
       // ✅ Redirection automatique vers /home
-      navigate("/home", { replace: true });
+      navigate(from, { replace: true });
     } catch (err) {
       console.error(err);
       setError("Erreur lors de la connexion");
