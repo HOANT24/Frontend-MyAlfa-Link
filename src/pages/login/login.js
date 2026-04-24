@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import "./Login.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { EtatGlobalContext } from "../EtatGlobal";
@@ -6,16 +6,62 @@ import logo from "../../assets/images/logo.webp";
 import ImageLogin from "../../assets/images/LoginImage.webp";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
+import CreateWithInfo from "./CreateWithInfo";
+import CreateWhitoutInfo from "./CreateWhitoutInfo";
 import { Lock, Eye, EyeOff, Mail, ArrowRight } from "lucide-react";
 
 function Login() {
   const { setClients, setClientSelect } = useContext(EtatGlobalContext);
+  const [clientLoading, setClientLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate(); // <-- hook pour rediriger
   const location = useLocation();
+
+  const [showCreateOverlay, setShowCreateOverlay] = useState(false);
 
   const from = location.state?.from
     ? location.state.from.pathname + location.state.from.search
     : "/home";
+
+  const pathname = location.state?.from?.pathname || "";
+
+  // exemple: "/559/preview-html"
+  const segments = pathname.split("/").filter(Boolean);
+
+  // si premier segment = id
+  const idFromUrl = segments.length > 1 ? segments[0] : null;
+
+  useEffect(() => {
+    if (!idFromUrl) {
+      setClientLoading(false);
+      return;
+    }
+
+    const fetchClient = async () => {
+      try {
+        setClientLoading(true);
+
+        const res = await fetch(
+          `https://backend-myalfa.vercel.app/api/clients/${idFromUrl}`
+        );
+
+        const clientData = await res.json();
+
+        if (clientData) {
+          setUserInfo({
+            nom: clientData.nom,
+            email: clientData.email,
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setClientLoading(false);
+      }
+    };
+
+    fetchClient();
+  }, [idFromUrl]);
 
   const [email, setEmail] = useState("");
   const [mdp, setMdp] = useState("");
@@ -94,7 +140,7 @@ function Login() {
             </div>
           </div>
         </div>
-        <div className="mb-8">
+        <div className="mb-2">
           <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight text-center">
             Accédez à votre espace client
           </h2>
@@ -104,6 +150,19 @@ function Login() {
           </p>
         </div>
 
+        {idFromUrl && (
+          <>
+            {clientLoading ? (
+              <p className="text-sm text-[#840040] mb-4">
+                Chargement des vos informations...
+              </p>
+            ) : (
+              <p className="text-sm text-[#840040] mb-4">
+                {userInfo?.nom || "Inconnu"}
+              </p>
+            )}
+          </>
+        )}
         {/* Formulaire */}
         <div className="space-y-5" style={{ width: "80%" }}>
           <div className="space-y-2">
@@ -179,36 +238,31 @@ function Login() {
 
           {error && <p className="TextInfo">{error}</p>}
         </div>
-
         <div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-10 text-center"
+          className="mt-5 text-center"
         >
           <p className="text-slate-500 text-sm">
-            Besoin d'aide ?{" "}
-            <a
-              href="https://alfacomptabilite.com/"
-              className="text-[#840040] hover:text-[#6a0033] font-medium transition-colors"
+            Pas d'identifiant ?{" "}
+            <span
+              onClick={() => setShowCreateOverlay(true)}
+              className="text-[#840040] hover:text-[#6a0033] font-medium transition-colors cursor-pointer"
             >
-              Contactez votre cabinet
-            </a>
+              Créez votre compte
+            </span>
           </p>
         </div>
 
         {/* Footer mobile */}
-        <div>
-          <br />
-          <br />
-          <br />
+        <div className="mt-5 text-center">
           <p className="text-slate-400 text-xs">
             © {new Date().getFullYear()} ALFA Comptabilité. Tous droits
             réservés.
           </p>
         </div>
       </form>
-
       <div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -249,6 +303,29 @@ function Login() {
           <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-white/3 rounded-full blur-2xl" />
         </div>
       </div>
+      {showCreateOverlay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Background */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowCreateOverlay(false)}
+          />
+
+          {/* Contenu */}
+          <div>
+            {userInfo ? (
+              <CreateWithInfo
+                userInfo={userInfo}
+                close={() => setShowCreateOverlay(false)}
+              />
+            ) : (
+              <CreateWhitoutInfo close={() => setShowCreateOverlay(false)} />
+            )}
+
+            {/* Close */}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

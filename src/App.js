@@ -33,7 +33,7 @@ function App() {
             }
           />
           <Route
-            path="/preview-html"
+            path="/:id?/preview-html"
             element={
               <ProtectedRoute>
                 <PreviewHtml />
