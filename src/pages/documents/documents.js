@@ -114,9 +114,9 @@ export default function Documents() {
           </div>
         </div>
 
-        <div className="flex-1 flex gap-6 overflow-hidden">
+        <div className="grid grid-cols-[20%_40%_40%] gap-6 overflow-hidden w-full">
           {/* Left: Tree Navigation */}
-          <div className="w-64 flex-shrink-0">
+          <div className="flex-shrink-0">
             <DocumentTree
               selectedFolder={activeFolder}
               onFolderSelect={setActiveFolder}
@@ -159,7 +159,7 @@ export default function Documents() {
           </div>
 
           {/* Right: Document Viewer */}
-          <div className="w-96 flex-shrink-0">
+          <div className="flex-shrink-0">
             <DocumentViewer
               document={selectedDocument}
               onClose={() => setSelectedDocument(null)}

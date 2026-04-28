@@ -8,7 +8,6 @@ export default function ActionStatsCard({
   description,
   page,
   count = 0,
-  countLabel = "éléments",
   color = "bg-blue-50",
   iconColor = "text-blue-600",
 }) {

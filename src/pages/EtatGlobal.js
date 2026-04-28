@@ -14,6 +14,8 @@ export const EtatGlobalProvider = ({ children }) => {
   const [loadingDemandes, setLoadingDemandes] = useState(true);
   const [rdvs, setRdv] = useState([]);
   const [loadingRdv, setLoadingRdv] = useState(true);
+  const [dataDashboard, setDataDashboard] = useState(null);
+  const [loadingDashboard, setLoadingDashboard] = useState(true);
 
   const [currentPage, setCurrentPage] = useState("Dashboard");
 
@@ -110,6 +112,30 @@ export const EtatGlobalProvider = ({ children }) => {
     }
   }, [clientSelect, fetchRdv]);
 
+  const fetchDashboard = async (clientId) => {
+    if (!clientId) return;
+
+    try {
+      setLoadingDashboard(true);
+      const res = await fetch(
+        `https://backend-myalfa.vercel.app/api/clients/${clientId}`
+      );
+      const data = await res.json();
+
+      setDataDashboard(data);
+    } catch (error) {
+      console.error("Erreur chargement dashboard :", error);
+    } finally {
+      setLoadingDashboard(false);
+    }
+  };
+
+  useEffect(() => {
+    if (clientSelect?.id) {
+      fetchDashboard(clientSelect.id);
+    }
+  }, [clientSelect]);
+
   return (
     <EtatGlobalContext.Provider
       value={{
@@ -137,6 +163,9 @@ export const EtatGlobalProvider = ({ children }) => {
         //
         currentPage,
         setCurrentPage,
+        //
+        dataDashboard,
+        loadingDashboard,
       }}
     >
       {children}
