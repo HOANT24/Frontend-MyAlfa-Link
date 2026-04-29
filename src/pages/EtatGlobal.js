@@ -6,7 +6,7 @@ export const EtatGlobalProvider = ({ children }) => {
   const [clients, setClients] = useState([]);
   const [clientSelect, setClientSelect] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [hasFetchedByEmail, setHasFetchedByEmail] = useState(false);
   // 🔥 documents globaux
   const [documents, setDocuments] = useState([]);
   const [loadingDocument, setLoadingDocument] = useState(true);
@@ -34,6 +34,60 @@ export const EtatGlobalProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (!clientSelect?.email || hasFetchedByEmail) return;
+
+    const fetchClientsByEmail = async () => {
+      try {
+        const res = await fetch(
+          "https://backend-myalfa.vercel.app/api/clients/email",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: clientSelect.email,
+            }),
+          }
+        );
+
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+          console.warn(
+            "Aucun client trouvé pour cet email :",
+            clientSelect.email
+          );
+          return;
+        }
+
+        // On extrait uniquement [id, nom]
+        const clientsTable = data.map((client) => ({
+          id: client.id,
+          nom: client.nom,
+          email: client.email,
+          email_expertComptable: client.email_expertComptable,
+          email_superviseur: client.email_superviseur,
+          email_collaborateur: client.email_collaborateur,
+          email_collaborateur_niv2: client.email_collaborateur_niv2,
+          email_social: client.email_social,
+        }));
+
+        // Stockage global (Context)
+        setClients(clientsTable);
+
+        // ✅ Sélection automatique du premier client
+        setClientSelect(clientsTable[0] || null);
+      } catch (error) {
+        console.error("Erreur récupération clients par email :", error);
+      } finally {
+        setHasFetchedByEmail(true);
+      }
+    };
+
+    fetchClientsByEmail();
+  }, [clientSelect?.email, hasFetchedByEmail]);
   // 🔥 Charger les documents depuis l’API
   const fetchDocuments = async (clientId) => {
     try {

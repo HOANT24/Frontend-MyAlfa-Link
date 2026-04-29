@@ -47,7 +47,7 @@ export default function UploadModal({ open, onClose }) {
       formData.append("folder", folder);
       formData.append("path", path || folder);
       formData.append("description", description);
-      formData.append("uploadedBy", "admin");
+      formData.append("uploadedBy", "user");
       formData.append("clientId", clientSelect?.id);
 
       const response = await fetch(
