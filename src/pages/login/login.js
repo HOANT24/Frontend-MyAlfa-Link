@@ -124,7 +124,7 @@ function Login() {
   return (
     <div className="flex min-h-screen w-full">
       <form
-        className="w-full max-w-md mx-auto flex flex-col items-center mt-10 mx-10 mb-10"
+        className="w-full max-w-md mx-auto flex flex-col items-center mt-10 px-10 mb-10"
         autoComplete="on"
         onSubmit={handleLogin}
       >
@@ -144,7 +144,7 @@ function Login() {
             </div>
           </div>
         </div>
-        <div className="mb-2">
+        <div className="mb-2 ">
           <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight text-center">
             Accédez à votre espace client
           </h2>
@@ -168,7 +168,7 @@ function Login() {
           </>
         )}
         {/* Formulaire */}
-        <div className="space-y-5 w-full">
+        <div className="space-y-5 w-full mt-5">
           <div className="space-y-2">
             <label htmlFor="email" className="text-slate-700 font-medium">
               Adresse email
