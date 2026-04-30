@@ -122,13 +122,17 @@ function Login() {
   };
 
   return (
-    <div className="LoginContainer">
+    <div className="flex min-h-screen w-full">
       <form
-        className="login w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-6 sm:p-12"
+        className="w-full max-w-md mx-auto flex flex-col items-center mt-10 mx-10 mb-10"
         autoComplete="on"
         onSubmit={handleLogin}
       >
-        <img src={logo} alt="Logo" className="logoLogin" />
+        <img
+          src={logo}
+          alt="Logo"
+          className="h-20 sm:h-24 lg:h-28 w-auto mb-4"
+        />
         <br />
         <div className="text-center mb-2">
           <div className="inline-flex items-center gap-2 mb-4">
@@ -164,7 +168,7 @@ function Login() {
           </>
         )}
         {/* Formulaire */}
-        <div className="space-y-5" style={{ width: "80%" }}>
+        <div className="space-y-5 w-full">
           <div className="space-y-2">
             <label htmlFor="email" className="text-slate-700 font-medium">
               Adresse email

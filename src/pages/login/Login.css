@@ -73,6 +73,11 @@
   height: 100vh;
 }
 
+@media (max-width: 768px) {
+  .ContainerLoginImage {
+    display: none;
+  }
+}
 .ImageLogin {
   width: auto;
   height: 650px;

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -46,6 +46,22 @@ const navigation = [
 function Layout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 1024px)"); // < lg
+
+    const handleResize = (e) => {
+      setSidebarCollapsed(e.matches); // true en mobile/tablette
+    };
+
+    // init
+    setSidebarCollapsed(mediaQuery.matches);
+
+    // listener
+    mediaQuery.addEventListener("change", handleResize);
+
+    return () => mediaQuery.removeEventListener("change", handleResize);
+  }, []);
+
   const {
     clients,
     clientSelect,
@@ -84,7 +100,7 @@ function Layout() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50  flex">
       {/* Sidebar */}
       <aside
         className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 transition-all duration-300 ease-in-out z-50 ${

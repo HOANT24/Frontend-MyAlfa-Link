@@ -31,10 +31,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-5 sm:py-6 lg:py-8">
         <WelcomeHeader userName={clientSelect.nom || "Client"} />
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+        <div className="grid grid-cols-1 w-[100%] sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-4 sm:mt-6 lg:mt-8">
           <ActionStatsCard
             icon={FolderOpen}
             title="Documents"
@@ -73,7 +73,7 @@ export default function Dashboard() {
           />
         </div>
         {/* Charts Section */}
-        <div className="grid lg:grid-cols-1 gap-6 mt-8">
+        <div className="grid lg:grid-cols-1 gap-6 mt-6 sm:mt-8">
           <AnnualMetricsChart data={dataDashboard} />
         </div>
       </div>
