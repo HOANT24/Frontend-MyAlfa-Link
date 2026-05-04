@@ -49,6 +49,7 @@ function Login() {
 
         if (clientData) {
           setUserInfo({
+            id: clientData.id,
             nom: clientData.nom,
             email: clientData.email,
           });

@@ -19,6 +19,7 @@ const CreateWithInfo = ({ userInfo, close }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [emailError, setEmailError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -31,7 +32,7 @@ const CreateWithInfo = ({ userInfo, close }) => {
 
   const passwordsMatch = form.mdp === form.confirmMdp;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (form.email !== userInfo.email) {
@@ -39,16 +40,36 @@ const CreateWithInfo = ({ userInfo, close }) => {
       return;
     }
 
+    if (!passwordsMatch) return;
+
     setEmailError(false);
+    setLoading(true);
 
-    const formData = new FormData();
-    formData.append("nom", form.nom);
-    formData.append("email", form.email);
-    formData.append("mdp", form.mdp);
+    try {
+      const res = await fetch(
+        `https://backend-myalfa.vercel.app/api/clients/${userInfo.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            mdp: form.mdp,
+          }),
+        }
+      );
 
-    console.log(Object.fromEntries(formData));
+      if (!res.ok) {
+        throw new Error("Erreur lors de la mise à jour");
+      }
 
-    setSubmitted(true);
+      setSubmitted(true);
+    } catch (error) {
+      console.error(error);
+      alert("Une erreur est survenue");
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -158,17 +179,18 @@ const CreateWithInfo = ({ userInfo, close }) => {
             <br />
             <button
               type="submit"
-              disabled={!passwordsMatch}
+              disabled={!passwordsMatch || loading}
               className="w-full bg-[#840040] text-white py-3 rounded-lg font-medium 
-                  hover:bg-[#6a0033] transition-all duration-300 
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  flex items-center justify-center gap-2"
+    hover:bg-[#6a0033] transition-all duration-300 
+    disabled:opacity-50 disabled:cursor-not-allowed
+    flex items-center justify-center gap-2"
             >
-              <span>Vérifier le compte</span>
+              {loading ? "Modification en cours..." : "Vérifier le compte"}
             </button>
             {emailError && (
               <p className="text-sm text-red-500 mt-3 text-center animate-pulse">
-                L’adresse e-mail saisie est incorrecte
+                L’adresse e-mail saisie est incorrecte ( ne correspondent pas au
+                mail du Dossier client)
               </p>
             )}
           </form>

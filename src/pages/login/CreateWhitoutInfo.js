@@ -20,6 +20,7 @@ const CreateWhitoutInfo = ({ close }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -30,17 +31,43 @@ const CreateWhitoutInfo = ({ close }) => {
 
   const passwordsMatch = form.mdp === form.confirmMdp;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("nom", form.nom);
-    formData.append("email", form.email);
-    formData.append("mdp", form.mdp);
+    if (!passwordsMatch) return;
 
-    console.log(Object.fromEntries(formData));
+    try {
+      setLoading(true);
 
-    setSubmitted(true);
+      const response = await fetch(
+        "https://backend-myalfa.vercel.app/api/login/validation",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nom: form.nom,
+            email: form.email,
+            mdp: form.mdp,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Erreur API");
+      }
+
+      // ✅ Succès → affichage du message + "login logique"
+      setSubmitted(true);
+    } catch (error) {
+      console.error(error);
+      alert("Erreur lors de l'envoi de la demande");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -169,13 +196,13 @@ const CreateWhitoutInfo = ({ close }) => {
             <br />
             <button
               type="submit"
-              disabled={!passwordsMatch}
+              disabled={!passwordsMatch || loading}
               className="w-full bg-[#840040] text-white py-3 rounded-lg font-medium 
-              hover:bg-[#6a0033] transition-all duration-300 
-              disabled:opacity-50 disabled:cursor-not-allowed
-              flex items-center justify-center gap-2"
+  hover:bg-[#6a0033] transition-all duration-300 
+  disabled:opacity-50 disabled:cursor-not-allowed
+  flex items-center justify-center gap-2"
             >
-              <span>Créer le compte</span>
+              {loading ? "Envoi en cours..." : "Créer le compte"}
             </button>
           </form>
         ) : (
