@@ -1,7 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { FileText, AlertCircle, Download } from "lucide-react";
+import { FileText, AlertCircle } from "lucide-react";
 import PanelVueEnsemble from "./panels/PanelVueEnsemble";
-import { openCrmDownload } from "./crmDownload";
 
 export default function AnnualMetricsChart({ data = {} }) {
   const suiviBilans = useMemo(() => {
@@ -48,50 +47,15 @@ export default function AnnualMetricsChart({ data = {} }) {
     <div className="p-6 border-0 bg-white shadow-sm hover:shadow-md rounded-xl">
       {/* HEADER */}
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-slate-500">
-          Compte Rendu annuel - {selectedYear}
-        </h3>
-
-        <div className="flex gap-2">
-          {annees.map((year) => (
-            <button
-              key={year}
-              onClick={() => setSelectedYear(year)}
-              className={`px-3 py-1 rounded-lg text-sm transition ${
-                selectedYear === year
-                  ? "bg-blue-600 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              {year}
-            </button>
-          ))}
+        <div className="mb-6">
+          <h3 className="text-sm font-medium text-slate-500">
+            Évolution Annuelle
+          </h3>
+          <p className="text-xs text-slate-400 mt-1">
+            Chiffre d'affaires, Résultat et Trésorerie
+          </p>
         </div>
       </div>
-
-      {/* DOWNLOAD */}
-      {hasIndicators && (
-        <div className="mb-4 mt-4 flex items-center gap-4 w-full justify-end">
-          <button
-            onClick={() => {
-              openCrmDownload(selectedData.indicators, selectedData.result);
-            }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-all duration-200 shadow-sm"
-            style={{ borderColor: "#7E1738", color: "#7E1738" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#7E1738";
-              e.currentTarget.style.color = "#fff";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color = "#7E1738";
-            }}
-          >
-            <Download className="w-4 h-4" />
-            Télécharger le Compte Rendu complet
-          </button>
-        </div>
-      )}
 
       {/* ⚠️ CAS : année sélectionnée sans data */}
       {hasSelectedData && !hasIndicators && (

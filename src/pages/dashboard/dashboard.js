@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import WelcomeHeader from "./WelcomHeader";
 import ActionStatsCard from "./ActionStatsCard";
 import AnnualMetricsChart from "./AnnualMetricsChart";
+import CompteRenduList from "./panels/TaxDeadlines";
 
 import { FolderOpen, Send, MessageSquare, Calendar } from "lucide-react";
 
@@ -73,8 +74,12 @@ export default function Dashboard() {
           />
         </div>
         {/* Charts Section */}
-        <div className="grid lg:grid-cols-1 gap-6 mt-6 sm:mt-8">
-          <AnnualMetricsChart data={dataDashboard} />
+
+        <div className="grid lg:grid-cols-3 gap-6 mt-8">
+          <div className="lg:col-span-2">
+            <AnnualMetricsChart data={dataDashboard} />
+          </div>
+          <CompteRenduList data={dataDashboard} />
         </div>
       </div>
     </div>
