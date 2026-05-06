@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import {
   ClipboardList,
@@ -7,56 +7,20 @@ import {
   Inbox,
   X,
   Calendar,
+  Loader2,
 } from "lucide-react";
+import { EtatGlobalContext } from "../EtatGlobal";
 
 export default function Questionnaires() {
-  const [questionnaires, setQuestionnaires] = useState([
-    {
-      id: 1,
-      title: "Mise à jour des informations fiscales",
-      description:
-        "Merci de vérifier et compléter vos informations fiscales pour l'année en cours.",
-      status: "EN_ATTENTE",
-      createdAt: "2026-04-20",
-      dueDate: "2026-05-10",
-      completedAt: null,
-    },
-    {
-      id: 2,
-      title: "Évaluation de situation patrimoniale",
-      description:
-        "Analyse complète de votre patrimoine afin de proposer des optimisations.",
-      status: "completed",
-      createdAt: "2026-03-15",
-      dueDate: "2026-04-01",
-      completedAt: "2026-03-28",
-    },
-    {
-      id: 3,
-      title: "Questionnaire KYC (Know Your Customer)",
-      description:
-        "Collecte d'informations obligatoires pour conformité réglementaire.",
-      status: "EN_ATTENTE",
-      createdAt: "2026-04-25",
-      dueDate: "2026-05-08",
-      completedAt: null,
-    },
-    {
-      id: 4,
-      title: "Préparation déclaration annuelle",
-      description:
-        "Merci de fournir les éléments nécessaires à votre déclaration annuelle.",
-      status: "completed",
-      createdAt: "2026-02-10",
-      dueDate: "2026-03-01",
-      completedAt: "2026-02-25",
-    },
-  ]);
+  const { questionnaires, loadingQuestionnaires, fetchQuestionnaires } =
+    useContext(EtatGlobalContext);
 
   const [activeTab, setActiveTab] = useState("EN_ATTENTE");
   const [selectedQ, setSelectedQ] = useState(null);
   const [reponse, setReponse] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false); // ← nouveau : loading pendant l'appel API
+  const [submitError, setSubmitError] = useState(null); // ← nouveau : gestion erreur
 
   const filteredQuestionnaires = questionnaires.filter((q) => {
     if (activeTab === "all") return true;
@@ -71,34 +35,66 @@ export default function Questionnaires() {
   ).length;
 
   const openOverlay = (q) => {
-    if (q.status === "completed") return; // bloquer si complété
+    if (q.status === "completed") return;
     setSelectedQ(q);
     setReponse("");
     setSubmitted(false);
+    setSubmitError(null);
   };
 
   const closeOverlay = () => {
     setSelectedQ(null);
     setReponse("");
     setSubmitted(false);
+    setSubmitError(null);
   };
 
-  const handleSubmit = () => {
-    if (!reponse.trim()) return;
-    setQuestionnaires((prev) =>
-      prev.map((q) =>
-        q.id === selectedQ.id
-          ? {
-              ...q,
-              status: "completed",
-              completedAt: new Date().toISOString().split("T")[0],
-            }
-          : q
-      )
-    );
-    setSubmitted(true);
-    setTimeout(() => closeOverlay(), 1800);
+  // ✅ handleSubmit avec appel API
+  const handleSubmit = async () => {
+    if (!reponse.trim() || submitting) return;
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch(
+        `https://backend-myalfa.vercel.app/api/Questionnaire/${selectedQ.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status: "completed",
+            answer: reponse,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erreur serveur : ${response.status}`);
+      }
+
+      setSubmitted(true);
+      await fetchQuestionnaires(); // ← rafraîchit la liste depuis le serveur
+    } catch (error) {
+      console.error("Erreur lors de l'envoi :", error);
+      setSubmitError("Une erreur est survenue. Veuillez réessayer.");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loadingQuestionnaires) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2
+          className="w-8 h-8 animate-spin text-slate-400"
+          color="#981845"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -195,8 +191,12 @@ export default function Questionnaires() {
                 </div>
                 <div className="text-xs text-slate-400 mt-3">
                   {q.status === "EN_ATTENTE"
-                    ? `À compléter avant le ${q.dueDate}`
-                    : `✓ Complété le ${q.completedAt}`}
+                    ? `À compléter avant le ${new Date(
+                        q.dueDate
+                      ).toLocaleDateString("fr-FR")}`
+                    : `✓ Complété le ${new Date(
+                        q.completedAt
+                      ).toLocaleDateString("fr-FR")}`}
                 </div>
               </div>
             ))}
@@ -238,7 +238,8 @@ export default function Questionnaires() {
               <div className="flex flex-wrap gap-2 mb-6">
                 <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2">
                   <Calendar className="w-3.5 h-3.5 opacity-60" />
-                  Échéance : {selectedQ.dueDate}
+                  Échéance :
+                  {new Date(selectedQ.dueDate).toLocaleDateString("fr-FR")}
                 </div>
                 <div className="flex items-center gap-2 text-xs font-medium bg-blue-50 border border-blue-100 text-blue-600 rounded-lg px-3 py-2">
                   <Clock className="w-3.5 h-3.5" />
@@ -246,11 +247,19 @@ export default function Questionnaires() {
                 </div>
               </div>
 
-              {/* Success banner */}
+              {/* ✅ Bannière succès */}
               {submitted && (
                 <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 mb-5 text-emerald-700 text-sm font-medium">
                   <CheckCircle className="w-5 h-5 flex-shrink-0" />
                   Votre réponse a bien été envoyée !
+                </div>
+              )}
+
+              {/* ❌ Bannière erreur */}
+              {submitError && (
+                <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-5 text-red-600 text-sm font-medium">
+                  <X className="w-5 h-5 flex-shrink-0" />
+                  {submitError}
                 </div>
               )}
 
@@ -264,7 +273,7 @@ export default function Questionnaires() {
               <textarea
                 value={reponse}
                 onChange={(e) => setReponse(e.target.value)}
-                disabled={submitted}
+                disabled={submitted || submitting}
                 placeholder="Écrivez votre réponse ici…"
                 rows={5}
                 className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 bg-slate-50 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:bg-white resize-y transition-all disabled:opacity-60 placeholder:text-slate-400"
@@ -277,16 +286,26 @@ export default function Questionnaires() {
               <div className="flex gap-3">
                 <button
                   onClick={closeOverlay}
-                  className="flex-1 py-3 border border-slate-200 rounded-xl text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
+                  disabled={submitting}
+                  className="flex-1 py-3 border border-slate-200 rounded-xl text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={submitted || !reponse.trim()}
-                  className="flex-[2] py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  disabled={submitted || submitting || !reponse.trim()}
+                  className="flex-[2] py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                 >
-                  {submitted ? "Réponse envoyée ✓" : "Envoyer ma réponse"}
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Envoi en cours…
+                    </>
+                  ) : submitted ? (
+                    "Réponse envoyée ✓"
+                  ) : (
+                    "Envoyer ma réponse"
+                  )}
                 </button>
               </div>
             </div>

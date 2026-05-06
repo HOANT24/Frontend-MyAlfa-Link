@@ -12,6 +12,8 @@ export const EtatGlobalProvider = ({ children }) => {
   const [loadingDocument, setLoadingDocument] = useState(true);
   const [demandes, setDemandes] = useState([]);
   const [loadingDemandes, setLoadingDemandes] = useState(true);
+  const [questionnaires, setQuestionnaires] = useState([]);
+  const [loadingQuestionnaires, setLoadingQuestionnaires] = useState(true);
   const [rdvs, setRdv] = useState([]);
   const [loadingRdv, setLoadingRdv] = useState(true);
   const [dataDashboard, setDataDashboard] = useState(null);
@@ -140,6 +142,29 @@ export const EtatGlobalProvider = ({ children }) => {
     }
   }, [clientSelect]);
 
+  const fetchQuestionnaires = async (clientId) => {
+    if (!clientId) return;
+
+    try {
+      setLoadingQuestionnaires(true);
+      const res = await fetch(
+        `https://backend-myalfa.vercel.app/api/Questionnaire/client/${clientId}`
+      );
+      const data = await res.json();
+      setQuestionnaires(data);
+    } catch (error) {
+      console.error("Erreur chargement Questionnaires :", error);
+    } finally {
+      setLoadingQuestionnaires(false);
+    }
+  };
+
+  useEffect(() => {
+    if (clientSelect?.id) {
+      fetchQuestionnaires(clientSelect.id);
+    }
+  }, [clientSelect]);
+
   const fetchRdv = useCallback(
     async (clientId) => {
       if (!clientId) return;
@@ -209,6 +234,11 @@ export const EtatGlobalProvider = ({ children }) => {
         setDemandes,
         fetchDemandes,
         loadingDemandes,
+        //
+        questionnaires,
+        setQuestionnaires,
+        fetchQuestionnaires,
+        loadingQuestionnaires,
         //
         rdvs,
         setRdv,

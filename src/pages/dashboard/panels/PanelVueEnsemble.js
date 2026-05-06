@@ -141,7 +141,6 @@ const PanelVueEnsemble = ({ indicators }) => {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 16px;
           flex-wrap: wrap;
           gap: 6px;
         }
@@ -170,7 +169,6 @@ const PanelVueEnsemble = ({ indicators }) => {
 
         @media (max-width: 640px) {
           .ca-card {
-            padding: 14px 16px;
             border-radius: 10px;
           }
           .ca-card-title {

@@ -4,16 +4,20 @@ import { openCrmPresentation } from "../crmGenerate";
 
 export default function CompteRenduList({ data = {} }) {
   const suiviBilans = useMemo(() => {
-    return data?.suiviBilans || [];
+    const bilans = data?.suiviBilans;
+    if (!Array.isArray(bilans)) return [];
+    return bilans;
   }, [data]);
 
   const annees = useMemo(() => {
-    return [...new Set(suiviBilans.map((item) => item.annees))].sort(
-      (a, b) => b - a
-    );
+    return [
+      ...new Set(
+        suiviBilans
+          .map((item) => item?.annee ?? item?.annees)
+          .filter((a) => a !== undefined && a !== null)
+      ),
+    ].sort((a, b) => b - a);
   }, [suiviBilans]);
-
-  console.log("liste des années", annees);
 
   return (
     <div
@@ -24,61 +28,64 @@ export default function CompteRenduList({ data = {} }) {
         border: "1px solid #F0EDF4",
       }}
     >
-      {/* Header band */}
+      {/* Header */}
       <div
-        className="px-6 py-5 flex items-center justify-between"
+        className="px-4 sm:px-6 py-3.5 sm:py-5 flex items-center justify-between"
         style={{
           background: "linear-gradient(135deg, #7E1738 0%, #A52050 100%)",
         }}
       >
         <div>
-          <h3 className="text-sm font-semibold text-white tracking-wide">
+          <h3 className="text-xs sm:text-sm font-semibold text-white tracking-wide">
             Comptes Rendus
           </h3>
           <p
-            className="text-xs mt-0.5"
+            className="text-[10px] sm:text-xs mt-0.5"
             style={{ color: "rgba(255,255,255,0.65)" }}
           >
             Bilans annuels disponibles
           </p>
         </div>
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center"
+          className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{ background: "rgba(255,255,255,0.15)" }}
         >
-          <FileText className="w-5 h-5 text-white" />
+          <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
         </div>
       </div>
 
-      <div className="p-5">
+      {/* Body */}
+      <div className="p-3 sm:p-5">
         {/* Empty state */}
         {annees.length === 0 ? (
-          <div className="text-center py-10 flex flex-col items-center gap-3">
+          <div className="text-center py-6 sm:py-10 flex flex-col items-center gap-2 sm:gap-3">
             <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center"
+              className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center"
               style={{ background: "#F0FDF4", border: "1px solid #DCFCE7" }}
             >
-              <CheckCircle className="w-7 h-7 text-green-500" />
+              <CheckCircle className="w-5 h-5 sm:w-7 sm:h-7 text-green-500" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-600">
+              <p className="text-xs sm:text-sm font-medium text-slate-600">
                 Aucun compte rendu disponible
               </p>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">
                 Les bilans apparaîtront ici une fois enregistrés
               </p>
             </div>
           </div>
         ) : (
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {annees.map((annee, index) => {
-              const item = suiviBilans.find((b) => b.annees === annee);
+              const item = suiviBilans.find(
+                (b) => (b?.annee ?? b?.annees) === annee
+              );
               const isLatest = index === 0;
 
               return (
                 <div
                   key={annee}
-                  className="group flex items-center justify-between rounded-xl px-4 py-3.5 transition-all duration-200"
+                  className="flex items-center justify-between rounded-xl px-3 sm:px-4 py-2.5 sm:py-3.5 transition-all duration-200"
                   style={{
                     background: isLatest ? "#FDF0F3" : "#F8F7FB",
                     border: isLatest
@@ -96,9 +103,9 @@ export default function CompteRenduList({ data = {} }) {
                   }}
                 >
                   {/* Left */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                     <div
-                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                      className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center flex-shrink-0"
                       style={{
                         background: isLatest
                           ? "rgba(126,23,56,0.1)"
@@ -106,21 +113,21 @@ export default function CompteRenduList({ data = {} }) {
                       }}
                     >
                       <TrendingUp
-                        className="w-4 h-4"
+                        className="w-3.5 h-3.5 sm:w-4 sm:h-4"
                         style={{ color: isLatest ? "#7E1738" : "#8A849A" }}
                       />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                         <p
-                          className="text-sm font-semibold"
+                          className="text-xs sm:text-sm font-semibold truncate"
                           style={{ color: "#1A1525" }}
                         >
                           Exercice {annee}
                         </p>
                         {isLatest && (
                           <span
-                            className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                            className="text-[10px] sm:text-xs font-semibold px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0"
                             style={{
                               background: "rgba(126,23,56,0.1)",
                               color: "#7E1738",
@@ -131,7 +138,7 @@ export default function CompteRenduList({ data = {} }) {
                         )}
                       </div>
                       <p
-                        className="text-xs mt-0.5"
+                        className="text-[10px] sm:text-xs mt-0.5"
                         style={{ color: "#8A849A" }}
                       >
                         Compte rendu annuel
@@ -142,9 +149,9 @@ export default function CompteRenduList({ data = {} }) {
                   {/* Button */}
                   <button
                     onClick={() =>
-                      openCrmPresentation(item.indicators, item.result)
+                      item && openCrmPresentation(item.indicators, item.result)
                     }
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200"
+                    className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all duration-200 flex-shrink-0 ml-2"
                     style={{
                       border: "1px solid #7E1738",
                       color: "#7E1738",
@@ -162,8 +169,7 @@ export default function CompteRenduList({ data = {} }) {
                       e.currentTarget.style.boxShadow = "none";
                     }}
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    Ouvrir
+                    <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </button>
                 </div>
               );

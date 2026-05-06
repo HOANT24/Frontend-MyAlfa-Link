@@ -23,7 +23,7 @@ export default function ActionStatsCard({
     <div
       onClick={handleClick}
       className="
-      w-1/2 lg:w-full min-w-0
+      w-full lg:w-full min-w-0
       p-3 sm:p-4 lg:p-5
       bg-white shadow-sm hover:shadow-md
       rounded-lg sm:rounded-xl

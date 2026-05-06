@@ -12,7 +12,6 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  Building2,
   User,
   LogOut,
 } from "lucide-react";
@@ -25,6 +24,7 @@ import Appointments from "../rdv/rdv";
 import Services from "../prestations/prestations";
 import Apps from "../applications/applications";
 import { EtatGlobalContext } from "../EtatGlobal";
+import logo from "../../assets/images/logo.webp";
 
 const navigation = [
   { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard },
@@ -100,7 +100,7 @@ function Layout() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50  flex">
+    <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar */}
       <aside
         className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 transition-all duration-300 ease-in-out z-50 ${
@@ -111,20 +111,19 @@ function Layout() {
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100">
           {!sidebarCollapsed ? (
             <Link to="/dashboard" className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-slate-800 to-slate-600 rounded-lg flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 from-slate-800 to-slate-600 rounded-lg flex items-center justify-center">
+                <img src={logo} alt="Logo" className=" text-white" />
               </div>
               <div>
                 <h1 className="text-sm font-semibold text-slate-800">
                   MyALFA Link
                 </h1>
-                <p className="text-xs text-slate-500">Cabinet Expert</p>
               </div>
             </Link>
           ) : (
             <Link to="/dashboard" className="mx-auto">
-              <div className="w-9 h-9 bg-gradient-to-br from-[#840040] to-[#a00050] rounded-lg flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 from-slate-800 to-slate-600 rounded-lg flex items-center justify-center">
+                <img src={logo} alt="Logo" className=" text-white" />
               </div>
             </Link>
           )}
@@ -250,7 +249,7 @@ function Layout() {
 
       {/* Main */}
       <main
-        className={`flex-1 p-6 transition-all ${
+        className={`flex-1 p-2 transition-all ${
           sidebarCollapsed ? "ml-20" : "ml-64"
         }`}
       >
