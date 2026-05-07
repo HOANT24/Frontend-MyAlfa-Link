@@ -11,10 +11,15 @@ import { FolderOpen, Send, MessageSquare, Calendar } from "lucide-react";
 import { EtatGlobalContext } from "../EtatGlobal";
 
 export default function Dashboard() {
-  const { clientSelect, dataDashboard, loadingDashboard, documents, demandes } =
-    useContext(EtatGlobalContext);
-
-  const [questionnaires] = useState([]);
+  const {
+    clientSelect,
+    dataDashboard,
+    loadingDashboard,
+    documents,
+    demandes,
+    questionnaires,
+    rdvs,
+  } = useContext(EtatGlobalContext);
 
   const [loading] = useState(false);
 
@@ -27,7 +32,7 @@ export default function Dashboard() {
   }
 
   const pendingQuestionnaires = questionnaires.filter(
-    (q) => q.status === "pending"
+    (q) => q.status === "EN_ATTENTE"
   ).length;
 
   return (
@@ -68,7 +73,7 @@ export default function Dashboard() {
             title="Prendre RDV"
             description="Réserver un rendez-vous"
             page="Appointments"
-            count={0}
+            count={rdvs.length}
             color="bg-purple-100"
             iconColor="text-purple-600"
           />
