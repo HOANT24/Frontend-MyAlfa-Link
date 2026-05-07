@@ -21,6 +21,7 @@ const CreateWhitoutInfo = ({ close }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [accountCreated, setAccountCreated] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -33,19 +34,16 @@ const CreateWhitoutInfo = ({ close }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!passwordsMatch) return;
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
-      const response = await fetch(
-        "https://backend-myalfa.vercel.app/api/login/validation",
+    try {
+      const createRes = await fetch(
+        "https://backend-myalfa.vercel.app/api/login/createComtpe",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             nom: form.nom,
             email: form.email,
@@ -54,13 +52,32 @@ const CreateWhitoutInfo = ({ close }) => {
         }
       );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Erreur API");
+      if (createRes.ok) {
+        setAccountCreated(true);
+        setSubmitted(true);
+        return;
       }
 
-      // ✅ Succès → affichage du message + "login logique"
+      const validationRes = await fetch(
+        "https://backend-myalfa.vercel.app/api/login/validation",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nom: form.nom,
+            email: form.email,
+            mdp: form.mdp,
+          }),
+        }
+      );
+
+      const validationData = await validationRes.json();
+
+      if (!validationRes.ok) {
+        throw new Error(validationData.message || "Erreur API validation");
+      }
+
+      setAccountCreated(false);
       setSubmitted(true);
     } catch (error) {
       console.error(error);
@@ -71,11 +88,13 @@ const CreateWhitoutInfo = ({ close }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="relative bg-white shadow-2xl rounded-2xl py-8 px-[10%] mx w-[600px] space-y-6 transform transition-all duration-500 hover:scale-[1.01]">
+    /* Overlay : occupe tout l'écran, scroll vertical si besoin */
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center px-4 py-6 sm:py-8 overflow-y-auto bg-black/30 backdrop-blur-sm">
+      {/* Carte : pleine largeur sur mobile, 600px max sur desktop */}
+      <div className="relative bg-white shadow-2xl rounded-2xl py-6 px-6 sm:px-[10%] w-full max-w-[600px] space-y-6 transform transition-all duration-500 hover:scale-[1.01] my-auto">
         <button
           onClick={() => close()}
-          className="absolute top-4 right-4 text-gray-500 hover:text-black"
+          className="absolute top-4 right-4 text-gray-500 hover:text-black text-lg leading-none"
         >
           ✕
         </button>
@@ -83,19 +102,19 @@ const CreateWhitoutInfo = ({ close }) => {
         {/* Icône */}
         <div className="flex justify-center">
           <div className="bg-[#840040]/10 p-3 rounded-full animate-pulse">
-            <ShieldCheck className="w-10 h-10 text-[#840040]" />
+            <ShieldCheck className="w-8 h-8 sm:w-10 sm:h-10 text-[#840040]" />
           </div>
         </div>
 
         {/* Titre */}
         <div className="text-center space-y-2">
-          <h2 className="text-2xl font-semibold text-gray-800">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
             Création de votre espace client
           </h2>
           <p className="text-xs text-gray-500 leading-relaxed">
             Si vous disposez de ce lien, cela signifie que vous faites déjà
-            partie des clients de notre cabinet.Toutefois, votre compte en ligne
-            n’a pas encore été activé.
+            partie des clients de notre cabinet. Toutefois, votre compte en
+            ligne n'a pas encore été activé.
           </p>
         </div>
 
@@ -103,7 +122,10 @@ const CreateWhitoutInfo = ({ close }) => {
           <form onSubmit={handleSubmit}>
             {/* Nom société */}
             <div className="space-y-2 mb-3">
-              <label htmlFor="email" className="text-slate-700 font-medium">
+              <label
+                htmlFor="nom"
+                className="text-slate-700 font-medium text-sm sm:text-base"
+              >
                 Nom de votre société (fourni au cabinet)
               </label>
               <div className="relative">
@@ -114,7 +136,7 @@ const CreateWhitoutInfo = ({ close }) => {
                   placeholder="Dénomination sociale"
                   value={form.nom}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#840040] transition"
+                  className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#840040] transition text-sm sm:text-base"
                   required
                 />
               </div>
@@ -122,7 +144,10 @@ const CreateWhitoutInfo = ({ close }) => {
 
             {/* Email */}
             <div className="space-y-2 mb-3">
-              <label htmlFor="email" className="text-slate-700 font-medium">
+              <label
+                htmlFor="email"
+                className="text-slate-700 font-medium text-sm sm:text-base"
+              >
                 Adresse e-mail (utilisée avec le cabinet)
               </label>
               <div className="relative">
@@ -130,10 +155,10 @@ const CreateWhitoutInfo = ({ close }) => {
                 <input
                   type="email"
                   name="email"
-                  placeholder="Email "
+                  placeholder="Email"
                   value={form.email}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#840040] transition"
+                  className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#840040] transition text-sm sm:text-base"
                   required
                 />
               </div>
@@ -141,7 +166,10 @@ const CreateWhitoutInfo = ({ close }) => {
 
             {/* Mot de passe */}
             <div className="space-y-2 mt-3">
-              <label htmlFor="mdp" className="text-slate-700 font-medium">
+              <label
+                htmlFor="mdp"
+                className="text-slate-700 font-medium text-sm sm:text-base"
+              >
                 Choisissez un mot de passe
               </label>
               <div className="relative">
@@ -152,7 +180,7 @@ const CreateWhitoutInfo = ({ close }) => {
                   placeholder="Mot de passe"
                   value={form.mdp}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#840040] transition"
+                  className="w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#840040] transition text-sm sm:text-base"
                   required
                 />
                 <div
@@ -172,7 +200,7 @@ const CreateWhitoutInfo = ({ close }) => {
                   placeholder="Confirmer le mot de passe"
                   value={form.confirmMdp}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none transition ${
+                  className={`w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none transition text-sm sm:text-base ${
                     form.confirmMdp.length > 0 && !passwordsMatch
                       ? "border-red-500 focus:ring-red-500"
                       : "focus:ring-[#840040]"
@@ -189,7 +217,7 @@ const CreateWhitoutInfo = ({ close }) => {
             </div>
 
             {form.confirmMdp && !passwordsMatch && (
-              <p className="text-sm text-red-500 animate-pulse">
+              <p className="text-sm text-red-500 animate-pulse mt-1">
                 Les mots de passe ne correspondent pas
               </p>
             )}
@@ -198,16 +226,42 @@ const CreateWhitoutInfo = ({ close }) => {
               type="submit"
               disabled={!passwordsMatch || loading}
               className="w-full bg-[#840040] text-white py-3 rounded-lg font-medium 
-  hover:bg-[#6a0033] transition-all duration-300 
-  disabled:opacity-50 disabled:cursor-not-allowed
-  flex items-center justify-center gap-2"
+                hover:bg-[#6a0033] transition-all duration-300 
+                disabled:opacity-50 disabled:cursor-not-allowed
+                flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               {loading ? "Envoi en cours..." : "Créer le compte"}
             </button>
           </form>
+        ) : accountCreated ? (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 sm:p-6 flex items-start gap-3 sm:gap-4 animate-fade-in">
+            <CheckCircle className="text-green-600 w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-green-800 leading-relaxed min-w-0">
+              <p className="font-semibold mb-1">Compte créé avec succès</p>
+              <p className="text-xs text-green-700">
+                Vous pouvez désormais vous connecter depuis l'écran d'accueil.{" "}
+                <br />
+                Veuillez ne jamais divulguer vos identifiants confidentiels.
+              </p>
+              <div className="mt-5 space-y-1">
+                <div className="flex items-start gap-2 flex-wrap">
+                  <Mail className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
+                  <span className="font-mono text-gray-700 text-xs sm:text-sm break-all">
+                    Adresse email : {form.email}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-green-700 flex-shrink-0" />
+                  <span className="font-mono text-gray-700 text-xs sm:text-sm">
+                    Mot de passe : {form.mdp}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 flex items-start gap-4 animate-fade-in">
-            <CheckCircle className="text-green-600 w-8 h-8" />
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 sm:p-6 flex items-start gap-3 sm:gap-4 animate-fade-in">
+            <CheckCircle className="text-green-600 w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-green-800 leading-relaxed">
               <p className="font-semibold mb-1">Demande envoyée avec succès</p>
               <p>

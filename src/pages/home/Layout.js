@@ -187,6 +187,7 @@ function Layout() {
                 key={item.page}
                 onClick={() => handleNavClick(item)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
+                    ${sidebarCollapsed ? "justify-center" : ""}
                   ${
                     isActive
                       ? "bg-[#840040] text-white"
@@ -198,11 +199,21 @@ function Layout() {
                   <span className="flex-1 text-left">{item.name}</span>
                 )}
                 {/* Badge cadenas Premium */}
-                {!sidebarCollapsed && isPremiumLocked && (
-                  <span className="ml-auto flex items-center gap-1 text-xs font-semibold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-500 border border-amber-200">
-                    <Lock className="w-2.5 h-2.5" />
-                    Pro
-                  </span>
+                {isPremiumLocked && (
+                  <>
+                    {sidebarCollapsed ? (
+                      // Sidebar réduite (mobile/tablette)
+                      <div className="ml-auto flex items-center justify-center w-6 h-6 rounded-full ">
+                        <Lock className="w-3 h-3 text-amber-500" />
+                      </div>
+                    ) : (
+                      // Sidebar normale
+                      <span className="ml-auto flex items-center gap-1 text-xs font-semibold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-500 border border-amber-200">
+                        <Lock className="w-2.5 h-2.5" />
+                        Pro
+                      </span>
+                    )}
+                  </>
                 )}
               </button>
             );
@@ -312,7 +323,7 @@ function Layout() {
               <div
                 className="absolute inset-0"
                 style={{
-                  filter: "blur(2px)",
+                  filter: "blur(1px)",
                   pointerEvents: "none",
                   userSelect: "none",
                 }}
