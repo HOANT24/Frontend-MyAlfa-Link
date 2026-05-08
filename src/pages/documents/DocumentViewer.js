@@ -28,12 +28,10 @@ const folderColors = {
 export default function DocumentViewer({ document, onClose }) {
   if (!document) {
     return (
-      <div className="p-6 border-0 bg-white shadow-sm h-full flex items-center justify-center">
-        <div className="text-center">
-          <FileText className="w-16 h-16 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-500 text-sm">
-            Sélectionnez un document pour le visualiser
-          </p>
+      <div className="bg-white shadow-sm h-full flex items-center justify-center rounded-xl">
+        <div className="text-center p-3">
+          <FileText className="w-6 h-6 text-slate-300 mx-auto mb-1" />
+          <p className="text-slate-400 text-[11px]">Sélectionnez un document</p>
         </div>
       </div>
     );
@@ -44,98 +42,99 @@ export default function DocumentViewer({ document, onClose }) {
   const isPdf = fileExtension === "pdf";
 
   return (
-    <div className="border-0 bg-white shadow-sm h-full flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="p-4 border-b border-slate-100 flex items-start justify-between">
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-slate-800 truncate">
+    <div className="bg-white shadow-sm h-full flex flex-col overflow-hidden rounded-xl">
+      {/* ── Header ── */}
+      <div className="px-2 py-1 border-b border-slate-100 flex items-center gap-1 min-w-0 flex-shrink-0">
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <p className="text-[11px] font-semibold text-slate-800 truncate leading-tight">
             {document.name}
-          </h3>
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <div
-              variant="secondary"
-              className={`${folderColors[document.folder]} border-0 text-xs`}
-              style={{ padding: "0.3% 1%", borderRadius: "5px" }}
+          </p>
+          <div className="flex items-center gap-1 mt-0.5 overflow-hidden">
+            <span
+              className={`${
+                folderColors[document.folder]
+              } text-[9px] px-1 py-px rounded shrink-0`}
             >
               {folderLabels[document.folder]}
-            </div>
+            </span>
             {document.year && (
-              <div variant="outline" className="text-xs border-slate-200">
+              <span className="text-[9px] border border-slate-200 text-slate-500 px-1 py-px rounded shrink-0">
                 {document.year}
-              </div>
+              </span>
             )}
+            <span className="text-[9px] text-slate-400 truncate">
+              {format(new Date(document.createdDate), "dd MMM yy", {
+                locale: fr,
+              })}
+            </span>
           </div>
-          {document.description && (
-            <p className="text-sm text-slate-600 mt-2">
-              {document.description}
-            </p>
-          )}
-          <p className="text-xs text-slate-400 mt-2">
-            Ajouté le{" "}
-            {format(new Date(document.createdDate), "dd MMMM yyyy", {
-              locale: fr,
-            })}
-          </p>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="w-5 h-5" />
-        </Button>
+        <button
+          onClick={onClose}
+          className="flex-shrink-0 p-0.5 rounded hover:bg-slate-100 text-slate-400"
+        >
+          <X className="w-3 h-3" />
+        </button>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-auto bg-slate-50 p-4">
+      {/* ── Contenu — hauteur fixe et réduite ── */}
+      <div
+        className="bg-slate-50 overflow-hidden flex-shrink-0"
+        style={{ height: "65vh" }}
+      >
         {isImage ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center h-full p-1">
             <img
               src={document.url}
               alt={document.name}
-              className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+              className="max-w-full max-h-full object-contain rounded"
             />
           </div>
         ) : isPdf ? (
           <iframe
             src={document.url}
-            className="w-full h-full rounded-lg shadow-lg bg-white"
+            className="w-full h-full bg-white"
             title={document.name}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="w-24 h-24 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
-              <File className="w-12 h-12 text-slate-400" />
+          <div className="flex flex-col items-center justify-center h-full gap-1">
+            <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
+              <File className="w-4 h-4 text-slate-400" />
             </div>
-            <p className="text-slate-600 font-medium mb-1">{document.name}</p>
-            <p className="text-sm text-slate-500 mb-4">
+            <p className="text-[10px] text-slate-500">
               Prévisualisation non disponible
             </p>
             <Button
+              size="sm"
               onClick={() => window.open(document.url, "_blank")}
-              className="gap-2"
-              style={{ paddingLeft: "16px", paddingRight: "16px" }}
+              className="gap-1 text-[10px] h-6 px-2"
             >
-              <ExternalLink className="w-4 h-4" />
-              Ouvrir dans un nouvel onglet
+              <ExternalLink className="w-2.5 h-2.5" />
+              Ouvrir
             </Button>
           </div>
         )}
       </div>
 
-      {/* Footer Actions */}
-      <div className="p-4 border-t border-slate-100 flex items-center gap-2">
+      {/* ── Footer ── */}
+      <div className="px-2 py-1 border-t border-slate-100 flex gap-1 flex-shrink-0">
         <Button
           variant="outline"
-          className="flex-1 gap-2"
+          size="sm"
+          className="flex-1 gap-1 text-[10px] h-6 px-2"
           onClick={() => window.open(document.url, "_blank")}
         >
-          <Download className="w-4 h-4" />
-          Télécharger
+          <Download className="w-2.5 h-2.5 flex-shrink-0" />
+          <span className="truncate">Télécharger</span>
         </Button>
         <Button
           variant="outline"
-          className="flex-1 gap-2"
+          size="sm"
+          className="flex-1 gap-1 text-[10px] h-6 px-2"
           onClick={() => window.open(document.url, "_blank")}
         >
-          <ExternalLink className="w-4 h-4" />
-          Ouvrir
+          <ExternalLink className="w-2.5 h-2.5 flex-shrink-0" />
+          <span className="truncate">Ouvrir</span>
         </Button>
       </div>
     </div>

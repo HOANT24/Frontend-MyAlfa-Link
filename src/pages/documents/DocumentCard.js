@@ -1,5 +1,4 @@
-import { Button } from "../../components/ui/button";
-import { FileText, Download, Trash2, Building2, User } from "lucide-react";
+import { FileText, Building2, User } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -19,39 +18,36 @@ const folderColors = {
   divers: "bg-slate-100 text-slate-700",
 };
 
-export default function DocumentCard({
-  document,
-  onDelete,
-  canDelete = false,
-}) {
-  const handleDownload = () => {
-    window.open(document.url, "_blank");
-  };
-
+export default function DocumentCard({ document }) {
   return (
-    <div className="p-4 hover:shadow-md transition-all duration-300 border-0 bg-white group">
-      <div className="flex items-start gap-3">
-        <div className="p-3 rounded-xl bg-slate-100 flex-shrink-0">
-          <FileText className="w-5 h-5 text-slate-600" />
+    <div className="p-3 sm:p-4 hover:shadow-md transition-all duration-300 bg-white rounded-xl w-full overflow-hidden">
+      <div className="flex items-start gap-2 sm:gap-3 min-w-0">
+        <div className="p-2 sm:p-3 rounded-xl bg-slate-100 flex-shrink-0">
+          <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
         </div>
+
+        {/* min-w-0 indispensable pour que truncate coupe au lieu de pousser */}
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-slate-800 truncate">
+          <h4 className="font-medium text-slate-800 text-sm sm:text-base break-all line-clamp-1">
             {document.name}
           </h4>
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <div
-              variant="secondary"
-              className={`${folderColors[document.folder]} border-0 text-xs`}
-              style={{ padding: "0.3% 1%", borderRadius: "5px" }}
+
+          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+            <span
+              className={`${
+                folderColors[document.folder]
+              } text-xs px-2 py-0.5 rounded-md whitespace-nowrap`}
             >
               {folderLabels[document.folder]}
-            </div>
+            </span>
+
             {document.year && (
-              <div variant="outline" className="text-xs border-slate-200">
+              <span className="text-xs border border-slate-200 text-slate-600 px-2 py-0.5 rounded-md whitespace-nowrap">
                 {document.year}
-              </div>
+              </span>
             )}
-            <div className="flex items-center gap-1 text-xs text-slate-500">
+
+            <span className="flex items-center gap-1 text-xs text-slate-500 whitespace-nowrap">
               {document.uploadedBy === "admin" ? (
                 <>
                   <Building2 className="w-3 h-3" />
@@ -63,38 +59,20 @@ export default function DocumentCard({
                   <span>Vous</span>
                 </>
               )}
-            </div>
+            </span>
           </div>
+
           {document.description && (
-            <p className="text-sm text-slate-500 mt-2 line-clamp-2">
+            <p className="hidden sm:block text-sm text-slate-500 mt-1.5 line-clamp-2 break-words">
               {document.description}
             </p>
           )}
-          <p className="text-xs text-slate-400 mt-2">
-            {format(new Date(document.createdDate), "d MMMM yyyy", {
+
+          <p className="text-xs text-slate-400 mt-1.5">
+            {format(new Date(document.createdDate), "d MMM yyyy", {
               locale: fr,
             })}
           </p>
-        </div>
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleDownload}
-            className="h-8 w-8 text-slate-500 hover:text-blue-600"
-          >
-            <Download className="w-4 h-4" />
-          </Button>
-          {canDelete && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(document.id)}
-              className="h-8 w-8 text-slate-500 hover:text-red-600"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          )}
         </div>
       </div>
     </div>

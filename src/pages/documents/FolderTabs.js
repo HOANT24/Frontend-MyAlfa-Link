@@ -20,15 +20,32 @@ const folders = [
 export default function FolderTabs({ value, onChange }) {
   return (
     <Tabs value={value} onValueChange={onChange} className="w-full">
-      <TabsList className="bg-slate-100 p-1 h-auto flex-wrap justify-start">
+      <TabsList
+        className="
+          bg-slate-100 p-1 h-auto
+          flex flex-nowrap overflow-x-auto
+          scrollbar-none
+          justify-start
+          gap-0.5
+        "
+      >
         {folders.map((folder) => (
           <TabsTrigger
             key={folder.value}
             value={folder.value}
-            className="data-[state=active]:bg-white data-[state=active]:shadow-sm gap-2 px-4"
+            className="
+              data-[state=active]:bg-white data-[state=active]:shadow-sm
+              flex-shrink-0
+              flex items-center gap-1.5
+              px-2.5 sm:px-4
+              py-1.5
+              text-xs sm:text-sm
+              whitespace-nowrap
+            "
           >
-            <folder.icon className="w-4 h-4" />
-            <span className="hidden sm:inline">{folder.label}</span>
+            <folder.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+            {/* Toujours visible mais taille réduite sur mobile */}
+            <span className="hidden xs:inline sm:inline">{folder.label}</span>
           </TabsTrigger>
         ))}
       </TabsList>
