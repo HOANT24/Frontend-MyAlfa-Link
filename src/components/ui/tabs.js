@@ -13,24 +13,20 @@ export const Tabs = ({ value, onValueChange, children }) => {
 
 export const TabsList = ({ children, className }) => {
   return (
-    <div className={`inline-flex bg-slate-100 rounded-full p-1 ${className}`}>
+    <div className={`flex bg-slate-100 rounded-full p-1 ${className}`}>
       {children}
     </div>
   );
 };
 
-export const TabsTrigger = ({ value, children, className }) => {
+export const TabsTrigger = ({ value, children, className = "px-4 py-2" }) => {
   const { value: activeValue, onValueChange } = useContext(TabsContext);
   const isActive = activeValue === value;
 
   return (
     <button
       onClick={() => onValueChange(value)}
-      className={`
-          ${className} 
-          ${isActive ? "bg-white font-semibold" : "text-gray-500"} 
-          px-4 py-2 rounded-full transition-colors duration-200 flex items-center
-        `}
+      className={`rounded-full transition-colors duration-200 flex items-center ${isActive ? "bg-white font-semibold" : "text-gray-500"} ${className}`}
     >
       {children}
     </button>

@@ -189,25 +189,40 @@ export default function Documents() {
           </div>
         </div>
 
-        {/* ── Viewer overlay mobile ── */}
+        {/* ── Viewer overlay mobile (z-[60] > sidebar z-50) ── */}
         {selectedDocument && (
-          <div className="md:hidden fixed inset-0 z-40 bg-white flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 flex-shrink-0">
-              <h2 className="font-semibold text-slate-800 text-sm truncate pr-4">
-                {selectedDocument.name}
-              </h2>
+          <div className="md:hidden fixed inset-0 z-[60] bg-white flex flex-col">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-shrink-0">
+              <div className="min-w-0 flex-1 pr-3">
+                <h2 className="font-semibold text-slate-800 text-sm truncate">
+                  {selectedDocument.name}
+                </h2>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className={`text-[10px] px-1.5 py-px rounded ${
+                    { comptabilite: "bg-blue-100 text-blue-700", fiscal: "bg-emerald-100 text-emerald-700", social: "bg-violet-100 text-violet-700", juridique: "bg-amber-100 text-amber-700", divers: "bg-slate-100 text-slate-700" }[selectedDocument.folder]
+                  }`}>
+                    {{ comptabilite: "Comptabilité", fiscal: "Fiscal", social: "Social", juridique: "Juridique", divers: "Divers" }[selectedDocument.folder]}
+                  </span>
+                  {selectedDocument.year && (
+                    <span className="text-[10px] border border-slate-200 text-slate-500 px-1.5 py-px rounded">
+                      {selectedDocument.year}
+                    </span>
+                  )}
+                </div>
+              </div>
               <button
                 onClick={() => setSelectedDocument(null)}
-                className="p-1 rounded-lg hover:bg-slate-100 flex-shrink-0"
+                className="p-1.5 rounded-lg hover:bg-slate-100 flex-shrink-0"
                 aria-label="Fermer"
               >
                 <X className="w-5 h-5 text-slate-600" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
               <DocumentViewer
                 document={selectedDocument}
                 onClose={() => setSelectedDocument(null)}
+                hideHeader
               />
             </div>
           </div>
