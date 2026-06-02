@@ -448,10 +448,10 @@ function Layout() {
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={{ opacity: isWebView ? 1 : 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: isWebView ? 0.12 : 0.2 }}
+              exit={{ opacity: isWebView ? 1 : 0 }}
+              transition={{ duration: isWebView ? 0 : 0.2 }}
               className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
               onClick={() => setMobileMenuOpen(false)}
             />
@@ -468,10 +468,10 @@ function Layout() {
                 return (
                   <motion.div
                     key={client.id}
-                    initial={{ opacity: 0, y: isWebView ? 8 : 20, scale: isWebView ? 0.95 : 0.8 }}
+                    initial={{ opacity: isWebView ? 1 : 0, y: isWebView ? 0 : 20, scale: isWebView ? 1 : 0.8 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: isWebView ? 8 : 20, scale: isWebView ? 0.95 : 0.8 }}
-                    transition={{ duration: isWebView ? 0.1 : undefined, delay: isWebView ? idx * 0.015 : (navigation.length + idx) * 0.04 }}
+                    exit={{ opacity: isWebView ? 1 : 0, y: isWebView ? 0 : 20, scale: isWebView ? 1 : 0.8 }}
+                    transition={{ duration: isWebView ? 0 : undefined, delay: isWebView ? 0 : (navigation.length + idx) * 0.04 }}
                     className="flex items-center gap-2 bg-white rounded-xl shadow-lg px-3 py-2 border border-slate-100 cursor-pointer"
                     onClick={() => { setClientSelect(client); setMobileMenuOpen(false); }}
                   >
@@ -504,10 +504,10 @@ function Layout() {
                 return (
                   <motion.div
                     key={item.name}
-                    initial={{ opacity: 0, x: isWebView ? 15 : 40, scale: isWebView ? 0.95 : 0.8 }}
+                    initial={{ opacity: isWebView ? 1 : 0, x: isWebView ? 0 : 40, scale: isWebView ? 1 : 0.8 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: isWebView ? 15 : 40, scale: isWebView ? 0.95 : 0.8 }}
-                    transition={{ duration: isWebView ? 0.1 : undefined, delay: isWebView ? i * 0.015 : i * 0.04 }}
+                    exit={{ opacity: isWebView ? 1 : 0, x: isWebView ? 0 : 40, scale: isWebView ? 1 : 0.8 }}
+                    transition={{ duration: isWebView ? 0 : undefined, delay: isWebView ? 0 : i * 0.04 }}
                     className="flex items-center gap-2"
                   >
                     <span className="text-sm font-medium text-white bg-slate-800/80 px-2.5 py-1 rounded-lg shadow backdrop-blur-sm flex items-center gap-1.5">
@@ -540,9 +540,9 @@ function Layout() {
         <motion.button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full bg-[#840040] shadow-xl flex items-center justify-center text-white"
-          whileTap={{ scale: 0.9 }}
-          animate={{ rotate: mobileMenuOpen ? 45 : 0 }}
-          transition={{ duration: isWebView ? 0.12 : 0.2 }}
+          whileTap={isWebView ? undefined : { scale: 0.9 }}
+          animate={isWebView ? undefined : { rotate: mobileMenuOpen ? 45 : 0 }}
+          transition={{ duration: isWebView ? 0 : 0.2 }}
         >
           {mobileMenuOpen ? (
             <X className="w-6 h-6" />
