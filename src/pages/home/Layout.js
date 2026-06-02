@@ -52,6 +52,8 @@ const navigation = [
 // Pages qui déclenchent l'overlay premium
 const PREMIUM_PAGES = ["Apps", "external"];
 
+const isWebView = navigator.userAgent.includes('; wv)') || new URLSearchParams(window.location.search).get('webview') === '1';
+
 function Layout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -75,6 +77,20 @@ function Layout() {
     currentPage,
     setCurrentPage,
   } = useContext(EtatGlobalContext);
+
+  // Bouton retour Android
+  useEffect(() => {
+    if (currentPage !== "Dashboard") {
+      window.history.pushState({ page: currentPage }, "");
+    }
+
+    const handlePopState = () => {
+      setCurrentPage("Dashboard");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [currentPage, setCurrentPage]);
 
   if (clients.length === 0) {
     return (
@@ -306,6 +322,19 @@ function Layout() {
           sidebarCollapsed ? "md:ml-20" : "md:ml-64"
         }`}
       >
+        {/* Back button mobile */}
+        {currentPage !== "Dashboard" && (
+          <div className="md:hidden mb-2">
+            <button
+              onClick={() => setCurrentPage("Dashboard")}
+              className="flex items-center gap-1.5 text-slate-600 px-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+              <span className="text-sm font-medium">Retour</span>
+            </button>
+          </div>
+        )}
+
         {/* Contenu normal (page courante) — flouté si page premium locked */}
         <div
           className="transition-all duration-300"
@@ -422,6 +451,7 @@ function Layout() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: isWebView ? 0.12 : 0.2 }}
               className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
               onClick={() => setMobileMenuOpen(false)}
             />
@@ -438,10 +468,10 @@ function Layout() {
                 return (
                   <motion.div
                     key={client.id}
-                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                    initial={{ opacity: 0, y: isWebView ? 8 : 20, scale: isWebView ? 0.95 : 0.8 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                    transition={{ delay: (navigation.length + idx) * 0.04 }}
+                    exit={{ opacity: 0, y: isWebView ? 8 : 20, scale: isWebView ? 0.95 : 0.8 }}
+                    transition={{ duration: isWebView ? 0.1 : undefined, delay: isWebView ? idx * 0.015 : (navigation.length + idx) * 0.04 }}
                     className="flex items-center gap-2 bg-white rounded-xl shadow-lg px-3 py-2 border border-slate-100 cursor-pointer"
                     onClick={() => { setClientSelect(client); setMobileMenuOpen(false); }}
                   >
@@ -474,10 +504,10 @@ function Layout() {
                 return (
                   <motion.div
                     key={item.name}
-                    initial={{ opacity: 0, x: 40, scale: 0.8 }}
+                    initial={{ opacity: 0, x: isWebView ? 15 : 40, scale: isWebView ? 0.95 : 0.8 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: 40, scale: 0.8 }}
-                    transition={{ delay: i * 0.04 }}
+                    exit={{ opacity: 0, x: isWebView ? 15 : 40, scale: isWebView ? 0.95 : 0.8 }}
+                    transition={{ duration: isWebView ? 0.1 : undefined, delay: isWebView ? i * 0.015 : i * 0.04 }}
                     className="flex items-center gap-2"
                   >
                     <span className="text-sm font-medium text-white bg-slate-800/80 px-2.5 py-1 rounded-lg shadow backdrop-blur-sm flex items-center gap-1.5">
@@ -512,7 +542,7 @@ function Layout() {
           className="fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full bg-[#840040] shadow-xl flex items-center justify-center text-white"
           whileTap={{ scale: 0.9 }}
           animate={{ rotate: mobileMenuOpen ? 45 : 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: isWebView ? 0.12 : 0.2 }}
         >
           {mobileMenuOpen ? (
             <X className="w-6 h-6" />
