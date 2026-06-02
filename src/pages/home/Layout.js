@@ -50,6 +50,8 @@ const navigation = [
 // Pages qui déclenchent l'overlay premium
 const PREMIUM_PAGES = ["Apps", "external"];
 
+const isWebView = navigator.userAgent.includes('; wv)');
+
 function Layout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [premiumOverlay, setPremiumOverlay] = useState(null); // { page, name, url?, external? }
@@ -150,9 +152,9 @@ function Layout() {
     <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 transition-all duration-300 ease-in-out z-50 ${
-          sidebarCollapsed ? "w-20" : "w-64"
-        }`}
+        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 z-50 ${
+          !isWebView ? "transition-all duration-300 ease-in-out" : ""
+        } ${sidebarCollapsed ? "w-20" : "w-64"}`}
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100">
@@ -299,9 +301,9 @@ function Layout() {
 
       {/* Main */}
       <main
-        className={`flex-1 p-2 transition-all relative ${
-          sidebarCollapsed ? "ml-20" : "ml-64"
-        }`}
+        className={`flex-1 p-2 relative ${
+          !isWebView ? "transition-all" : ""
+        } ${sidebarCollapsed ? "ml-20" : "ml-64"}`}
       >
         {/* Contenu normal (page courante) — flouté si page premium locked */}
         <div
