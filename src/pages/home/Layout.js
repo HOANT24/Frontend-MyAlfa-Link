@@ -18,6 +18,7 @@ import {
   X,
   Zap,
   Menu,
+  Phone,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -28,6 +29,7 @@ import Questionnaires from "../questionnaires/questionnaires";
 import Appointments from "../rdv/rdv";
 import Services from "../prestations/prestations";
 import Apps from "../applications/applications";
+import Contact from "../contact/contact";
 import { EtatGlobalContext } from "../EtatGlobal";
 import logo from "../../assets/images/logo.webp";
 
@@ -39,6 +41,7 @@ const navigation = [
   { name: "Rendez-vous", page: "Appointments", icon: Calendar },
   { name: "Prestations", page: "Services", icon: Briefcase },
   { name: "Applications", page: "Apps", icon: AppWindow, premium: true },
+  { name: "Contact", page: "Contact", icon: Phone },
   {
     name: "MyALFA RHelp",
     page: "external",
@@ -148,6 +151,8 @@ function Layout() {
         return <Services />;
       case "Apps":
         return <Apps />;
+      case "Contact":
+        return <Contact />;
       default:
         return <Dashboard />;
     }
