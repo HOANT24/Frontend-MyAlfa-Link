@@ -37,13 +37,8 @@ const openUrl = (url) => {
 
 const downloadFile = (url, name) => {
   if (isWebView) {
-    // Déclenche le DownloadListener Flutter via un lien <a download>
-    const a = document.createElement('a');
-    a.href = url;
-    a.setAttribute('download', name || 'document');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Ouvre dans Chrome Android — l'utilisateur peut télécharger depuis Chrome
+    window.location.href = url;
   } else {
     const a = document.createElement('a');
     a.href = url;
