@@ -26,12 +26,39 @@ const folderColors = {
 };
 
 const isWebView = navigator.userAgent.includes('; wv)');
+
 const openUrl = (url) => {
   if (isWebView) {
     window.location.href = url;
   } else {
     window.open(url, '_blank');
   }
+};
+
+const downloadFile = (url, name) => {
+  if (isWebView) {
+    // Déclenche le DownloadListener Flutter via un lien <a download>
+    const a = document.createElement('a');
+    a.href = url;
+    a.setAttribute('download', name || 'document');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } else {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name || 'document';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+};
+
+const getPdfSrc = (url) => {
+  if (isWebView) {
+    return `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+  }
+  return url;
 };
 
 export default function DocumentViewer({ document, onClose, hideHeader = false }) {
@@ -100,7 +127,7 @@ export default function DocumentViewer({ document, onClose, hideHeader = false }
           </div>
         ) : isPdf ? (
           <iframe
-            src={document.url}
+            src={getPdfSrc(document.url)}
             className="w-full h-full bg-white"
             title={document.name}
           />
@@ -130,7 +157,7 @@ export default function DocumentViewer({ document, onClose, hideHeader = false }
           variant="outline"
           size="sm"
           className="flex-1 gap-1.5 text-xs h-9 px-3"
-          onClick={() => openUrl(document.url)}
+          onClick={() => downloadFile(document.url, document.name)}
         >
           <Download className="w-3.5 h-3.5 flex-shrink-0" />
           <span className="truncate">Télécharger</span>
