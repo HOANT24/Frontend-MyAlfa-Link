@@ -25,6 +25,15 @@ const folderColors = {
   divers: "bg-slate-100 text-slate-700",
 };
 
+const isWebView = navigator.userAgent.includes('; wv)');
+const openUrl = (url) => {
+  if (isWebView) {
+    window.location.href = url;
+  } else {
+    window.open(url, '_blank');
+  }
+};
+
 export default function DocumentViewer({ document, onClose, hideHeader = false }) {
   if (!document) {
     return (
@@ -105,7 +114,7 @@ export default function DocumentViewer({ document, onClose, hideHeader = false }
             </p>
             <Button
               size="sm"
-              onClick={() => window.open(document.url, "_blank")}
+              onClick={() => openUrl(document.url)}
               className="gap-1.5 text-xs h-8 px-3"
             >
               <ExternalLink className="w-3.5 h-3.5" />
@@ -121,7 +130,7 @@ export default function DocumentViewer({ document, onClose, hideHeader = false }
           variant="outline"
           size="sm"
           className="flex-1 gap-1.5 text-xs h-9 px-3"
-          onClick={() => window.open(document.url, "_blank")}
+          onClick={() => openUrl(document.url)}
         >
           <Download className="w-3.5 h-3.5 flex-shrink-0" />
           <span className="truncate">Télécharger</span>
@@ -130,7 +139,7 @@ export default function DocumentViewer({ document, onClose, hideHeader = false }
           variant="outline"
           size="sm"
           className="flex-1 gap-1.5 text-xs h-9 px-3"
-          onClick={() => window.open(document.url, "_blank")}
+          onClick={() => openUrl(document.url)}
         >
           <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
           <span className="truncate">Ouvrir</span>
