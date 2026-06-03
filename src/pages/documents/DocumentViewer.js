@@ -36,9 +36,8 @@ const openUrl = (url) => {
 };
 
 const downloadFile = (url, name) => {
-  if (isWebView) {
-    // Ouvre dans Chrome Android — l'utilisateur peut télécharger depuis Chrome
-    window.location.href = url;
+  if (isWebView && window.DownloadFile) {
+    window.DownloadFile.postMessage(url);
   } else {
     const a = document.createElement('a');
     a.href = url;
