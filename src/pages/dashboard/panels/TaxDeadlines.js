@@ -6,7 +6,7 @@ export default function CompteRenduList({ data = {} }) {
   const suiviBilans = useMemo(() => {
     const bilans = data?.suiviBilans;
     if (!Array.isArray(bilans)) return [];
-    return bilans;
+    return bilans.filter((b) => b?.indicators && b?.result);
   }, [data]);
 
   const annees = useMemo(() => {
