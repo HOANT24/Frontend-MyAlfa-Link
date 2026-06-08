@@ -6,6 +6,7 @@ import Documents from "./pages/documents/documents";
 import ProtectedRoute from "./pages/login/ProtectedRoute";
 import PreviewHtml from "./pages/previewHTML/PreviewHtml";
 import ResetPassword from "./pages/login/ResetPassword";
+import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
 import { EtatGlobalProvider } from "./pages/EtatGlobal";
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           {/* Pages publiques (sans authentification) */}
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
 
           {/* Route inconnue → home */}
           <Route path="*" element={<Navigate to="/home" replace />} />
