@@ -350,7 +350,16 @@ function Login() {
               Entrez votre email. Si un compte existe, vous recevrez un lien de réinitialisation.
             </p>
             {forgotMessage ? (
-              <p className="text-sm text-[#840040] font-medium text-center">{forgotMessage}</p>
+              <div className="text-center space-y-4">
+                <p className="text-sm text-[#840040] font-medium">{forgotMessage}</p>
+                <button
+                  type="button"
+                  onClick={() => { setForgotMessage(""); }}
+                  className="text-sm text-slate-500 hover:text-[#840040] underline transition-colors"
+                >
+                  Renvoyer le lien
+                </button>
+              </div>
             ) : (
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div className="relative">
