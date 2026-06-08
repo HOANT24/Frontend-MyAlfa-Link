@@ -8,7 +8,7 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import CreateWithInfo from "./CreateWithInfo";
 import CreateWhitoutInfo from "./CreateWhitoutInfo";
-import { Lock, Eye, EyeOff, Mail, ArrowRight } from "lucide-react";
+import { Lock, Eye, EyeOff, Mail, ArrowRight, X } from "lucide-react";
 
 function Login() {
   const { setClients, setClientSelect } = useContext(EtatGlobalContext);
@@ -18,6 +18,10 @@ function Login() {
   const location = useLocation();
 
   const [showCreateOverlay, setShowCreateOverlay] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMessage, setForgotMessage] = useState("");
 
   const from = location.state?.from
     ? location.state.from.pathname + location.state.from.search
@@ -69,6 +73,24 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    setForgotMessage("");
+    try {
+      await fetch("https://backend-myalfa.vercel.app/api/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      setForgotMessage("Si cet email existe, un lien de réinitialisation a été envoyé.");
+    } catch {
+      setForgotMessage("Erreur lors de l'envoi. Réessayez.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -216,12 +238,13 @@ function Login() {
           </div>
 
           <div className="flex justify-end">
-            <a
-              href="https://alfacomptabilite.com/"
+            <button
+              type="button"
+              onClick={() => { setShowForgotModal(true); setForgotMessage(""); setForgotEmail(""); }}
               className="text-sm text-[#840040] hover:text-[#6a0033] font-medium transition-colors"
             >
               Mot de passe oublié ?
-            </a>
+            </button>
           </div>
 
           <Button
@@ -308,6 +331,52 @@ function Login() {
           <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-white/3 rounded-full blur-2xl" />
         </div>
       </div>
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowForgotModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4">
+            <button
+              type="button"
+              onClick={() => setShowForgotModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-xl font-semibold text-slate-900 mb-1">Mot de passe oublié</h2>
+            <p className="text-sm text-slate-500 mb-6">
+              Entrez votre email. Si un compte existe, vous recevrez un lien de réinitialisation.
+            </p>
+            {forgotMessage ? (
+              <p className="text-sm text-[#840040] font-medium text-center">{forgotMessage}</p>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <Input
+                    type="email"
+                    placeholder="votre@email.fr"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                    className="pl-12 h-12 bg-white border-slate-200 focus:border-[#840040] focus:ring-[#840040]/20 rounded-xl text-slate-900 placeholder:text-slate-400"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={forgotLoading}
+                  className="w-full h-11 bg-[#840040] hover:bg-[#6a0033] text-white rounded-xl font-medium transition-all duration-200"
+                >
+                  {forgotLoading ? "Envoi en cours..." : "Envoyer le lien"}
+                </Button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
       {showCreateOverlay && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Background */}
