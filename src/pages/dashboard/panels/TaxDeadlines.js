@@ -1,8 +1,11 @@
-import { FileText, CheckCircle, ExternalLink, TrendingUp } from "lucide-react";
-import { useMemo } from "react";
+import { FileText, CheckCircle, ExternalLink, TrendingUp, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import { openCrmPresentation } from "../crmGenerate";
 
+const isWebView = navigator.userAgent.includes('; wv)');
+
 export default function CompteRenduList({ data = {} }) {
+  const [crmHtml, setCrmHtml] = useState(null);
   const suiviBilans = useMemo(() => {
     const bilans = data?.suiviBilans;
     if (!Array.isArray(bilans)) return [];
@@ -20,6 +23,7 @@ export default function CompteRenduList({ data = {} }) {
   }, [suiviBilans]);
 
   return (
+    <>
     <div
       className="bg-white rounded-2xl overflow-hidden"
       style={{
@@ -148,9 +152,11 @@ export default function CompteRenduList({ data = {} }) {
 
                   {/* Button */}
                   <button
-                    onClick={() =>
-                      item && openCrmPresentation(item.indicators, item.result)
-                    }
+                    onClick={() => {
+                      if (!item) return;
+                      const result = openCrmPresentation(item.indicators, item.result);
+                      if (isWebView && result) setCrmHtml(result);
+                    }}
                     className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all duration-200 flex-shrink-0 ml-2"
                     style={{
                       border: "1px solid #7E1738",
@@ -178,5 +184,25 @@ export default function CompteRenduList({ data = {} }) {
         )}
       </div>
     </div>
+
+    {crmHtml && (
+      <div className="fixed inset-0 z-50 flex flex-col bg-white">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 flex-shrink-0">
+          <span className="text-sm font-semibold text-slate-800">Compte rendu</span>
+          <button
+            onClick={() => setCrmHtml(null)}
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <iframe
+          srcDoc={crmHtml}
+          className="flex-1 w-full border-none"
+          title="Compte rendu"
+        />
+      </div>
+    )}
+    </>
   );
 }

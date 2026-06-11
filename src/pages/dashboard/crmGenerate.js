@@ -1930,20 +1930,13 @@ if (panel === 'social') {
   </body>
   </html>`;
 
+  const isWebView = navigator.userAgent.includes('; wv)');
+  if (isWebView) {
+    return html;
+  }
+
   const win = window.open("", "_blank");
   win.document.open();
   win.document.write(html);
   win.document.close();
-
-  // setTimeout(() => {
-  //   const blob = new Blob([html], { type: "text/html" });
-  //   const url = URL.createObjectURL(blob);
-
-  //   const a = document.createElement("a");
-  //   a.href = url;
-  //   a.download = "crm-presentation.html";
-  //   a.click();
-
-  //   URL.revokeObjectURL(url);
-  // }, 300);
 }
