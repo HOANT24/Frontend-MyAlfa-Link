@@ -7,6 +7,7 @@ import ProtectedRoute from "./pages/login/ProtectedRoute";
 import PreviewHtml from "./pages/previewHTML/PreviewHtml";
 import ResetPassword from "./pages/login/ResetPassword";
 import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
+import DeleteAccount from "./pages/legal/DeleteAccount";
 import { EtatGlobalProvider } from "./pages/EtatGlobal";
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/delete-account" element={<DeleteAccount />} />
 
           {/* Route inconnue → home */}
           <Route path="*" element={<Navigate to="/home" replace />} />
